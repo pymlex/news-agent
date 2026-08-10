@@ -22,9 +22,6 @@ html, body, .gradio-container {
 
 .gradio-container {
   max-width: 1480px !important;
-}
-
-.gradio-container {
   --body-background-fill: #020617 !important;
   --background-fill-primary: #0B1220 !important;
   --background-fill-secondary: #111827 !important;
@@ -48,17 +45,17 @@ footer {
   border-radius: 24px;
   padding: 20px 22px 16px;
   border: 1px solid #252E3F;
-  gap: 14px !important;
+  gap: 12px !important;
 }
 
 #na-title h1 {
   color: #F8FAFC !important;
-  margin-bottom: 4px !important;
+  margin: 0 0 6px 0 !important;
 }
 
 #na-title p, #na-title .md p {
   color: #94A3B8 !important;
-  font-weight: 500 !important;
+  margin: 0 !important;
 }
 
 .na-chip {
@@ -68,52 +65,56 @@ footer {
   border-radius: 999px;
   padding: 5px 11px;
   font-size: 12px;
-  margin-right: 6px;
+  margin: 8px 6px 10px 0;
   border: 1px solid #2A3348;
 }
 
-#na-toolbar {
-  gap: 12px !important;
+.na-field-label {
+  color: #94A3B8 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0 0 6px 0 !important;
+  padding: 0 !important;
 }
 
-#na-toolbar .block {
+.na-field-label p {
+  margin: 0 !important;
+  color: #94A3B8 !important;
+}
+
+#na-toolbar .block,
+#na-create .block,
+#na-composer .block {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
   padding: 0 !important;
-}
-
-#na-toolbar label, #na-toolbar .label-wrap span {
-  color: #94A3B8 !important;
-  font-size: 12px !important;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  margin: 0 !important;
 }
 
 #na-toolbar .wrap-inner,
-#na-toolbar textarea,
-#na-toolbar input {
+#na-create .wrap-inner,
+#na-create textarea,
+#na-create input,
+#na-composer textarea {
   background: #0F172A !important;
   border: 1px solid #2A3348 !important;
   border-radius: 14px !important;
-  min-height: 44px !important;
   color: #F8FAFC !important;
   box-shadow: none !important;
+  min-height: 44px !important;
 }
 
 #na-toolbar .wrap-inner {
   padding: 0 12px !important;
 }
 
-#na-toolbar button {
-  min-height: 44px !important;
+#na-create button,
+#na-composer button {
   border-radius: 14px !important;
-  margin-top: 22px !important;
-}
-
-#na-main {
-  gap: 12px !important;
-  align-items: stretch !important;
+  min-height: 44px !important;
 }
 
 #na-chatbot, #na-graph {
@@ -143,33 +144,13 @@ footer {
   color: #E2E8F0 !important;
 }
 
-.prose, .prose *, .markdown-body, .markdown-body *, #na-status {
+.prose, .prose *, .markdown-body, .markdown-body * {
   color: #E2E8F0 !important;
 }
 
 .prose th, .prose td, .markdown-body th, .markdown-body td {
   border-color: #2A3348 !important;
   color: #E2E8F0 !important;
-}
-
-#na-composer .block {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-}
-
-#na-composer textarea {
-  background: #0F172A !important;
-  border: 1px solid #2A3348 !important;
-  border-radius: 16px !important;
-  color: #F8FAFC !important;
-  min-height: 72px !important;
-}
-
-#na-composer button {
-  border-radius: 14px !important;
-  min-height: 44px !important;
 }
 
 button.primary, .primary {
@@ -203,14 +184,12 @@ def _profile_choices() -> list[str]:
     return names
 
 
-def on_profile_change(profile_name: str) -> str:
+def on_profile_change(profile_name: str) -> None:
     agent.set_profile(profile_name)
-    return f"Профиль: **{profile_name}**"
 
 
-def on_model_change(model_name: str) -> str:
+def on_model_change(model_name: str) -> None:
     agent.set_model(model_name)
-    return f"Модель: `{model_name}`"
 
 
 def respond(
@@ -246,11 +225,7 @@ def create_profile(new_name: str, current: str):
     choices = _profile_choices()
     if name not in choices:
         choices.append(name)
-    return (
-        gr.update(choices=choices, value=name),
-        "",
-        f"Профиль: **{name}**",
-    )
+    return gr.update(choices=choices, value=name), ""
 
 
 def build_ui() -> gr.Blocks:
@@ -273,36 +248,39 @@ def build_ui() -> gr.Blocks:
                 elem_id="na-title",
             )
 
-            with gr.Row(elem_id="na-toolbar"):
-                profile = gr.Dropdown(
-                    choices=_profile_choices(),
-                    value="default",
-                    label="Профиль",
-                    interactive=True,
-                    scale=1,
-                    container=True,
-                )
-                model = gr.Dropdown(
-                    choices=CHEAP_MODELS,
-                    value=default_model,
-                    label="Модель",
-                    interactive=True,
-                    scale=2,
-                    container=True,
-                )
+            with gr.Row(elem_id="na-toolbar", equal_height=False):
+                with gr.Column(scale=1, min_width=220):
+                    gr.Markdown("Профиль", elem_classes=["na-field-label"])
+                    profile = gr.Dropdown(
+                        choices=_profile_choices(),
+                        value="default",
+                        show_label=False,
+                        container=False,
+                        interactive=True,
+                    )
+                with gr.Column(scale=2, min_width=320):
+                    gr.Markdown("Модель", elem_classes=["na-field-label"])
+                    model = gr.Dropdown(
+                        choices=CHEAP_MODELS,
+                        value=default_model,
+                        show_label=False,
+                        container=False,
+                        interactive=True,
+                    )
 
-            with gr.Row(elem_id="na-toolbar"):
-                new_profile = gr.Textbox(
-                    label="Создать профиль",
-                    placeholder="pilates, силовые, медицина",
-                    scale=4,
-                    container=True,
-                )
-                create_btn = gr.Button("Создать", variant="secondary", scale=1)
+            with gr.Row(elem_id="na-create", equal_height=True):
+                with gr.Column(scale=4, min_width=260):
+                    gr.Markdown("Новый профиль", elem_classes=["na-field-label"])
+                    new_profile = gr.Textbox(
+                        show_label=False,
+                        container=False,
+                        placeholder="pilates, силовые, медицина",
+                    )
+                with gr.Column(scale=1, min_width=120):
+                    gr.HTML("<div style='height:22px'></div>")
+                    create_btn = gr.Button("Создать", variant="secondary")
 
-            status = gr.Markdown("Профиль: **default**", elem_id="na-status")
-
-            with gr.Row(elem_id="na-main", equal_height=True):
+            with gr.Row(equal_height=True):
                 chatbot = gr.Chatbot(
                     elem_id="na-chatbot",
                     label="Диалог",
@@ -319,7 +297,6 @@ def build_ui() -> gr.Blocks:
 
             with gr.Row(elem_id="na-composer"):
                 user_input = gr.Textbox(
-                    elem_id="na-input",
                     placeholder=(
                         "доверенные СМИ про пилатес, ссылка на новость, "
                         "тема для графа или синтез новости"
@@ -327,17 +304,17 @@ def build_ui() -> gr.Blocks:
                     scale=5,
                     lines=2,
                     show_label=False,
-                    container=True,
+                    container=False,
                 )
                 send_btn = gr.Button("Отправить", variant="primary", scale=1)
                 digest_btn = gr.Button("Сводка", variant="secondary", scale=1)
 
-            profile.change(on_profile_change, inputs=profile, outputs=status)
-            model.change(on_model_change, inputs=model, outputs=status)
+            profile.change(on_profile_change, inputs=profile, outputs=None)
+            model.change(on_model_change, inputs=model, outputs=None)
             create_btn.click(
                 create_profile,
                 inputs=[new_profile, profile],
-                outputs=[profile, new_profile, status],
+                outputs=[profile, new_profile],
             )
             send_btn.click(
                 respond,
