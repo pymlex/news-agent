@@ -5,7 +5,7 @@ import gradio as gr
 
 
 from agent.orchestrator import agent
-from utils.config import settings
+from utils.config import Settings, settings
 from utils.db import db
 from utils.zveno import CHEAP_MODELS
 
@@ -401,6 +401,8 @@ def main() -> None:
     """Launch the Gradio citation agent interface."""
 
     settings.ensure_data_dir()
+    if not Settings().zvenoai_api_key.strip():
+        print("WARNING: ZVENOAI_API_KEY is empty in .env")
     demo = build_ui()
     theme = gr.themes.Default(
         primary_hue="blue",

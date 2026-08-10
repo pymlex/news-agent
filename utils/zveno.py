@@ -6,7 +6,7 @@ import httpx
 from tqdm.auto import tqdm
 
 
-from utils.config import settings
+from utils.config import Settings, settings
 
 
 CHEAP_MODELS = [
@@ -35,9 +35,17 @@ class ZvenoClient:
             model: Default model slug.
         """
 
-        self.api_key = api_key if api_key is not None else settings.zvenoai_api_key
+        self._api_key_override = api_key
         self.base_url = (base_url or settings.zvenoai_base_url).rstrip("/")
         self.model = model or settings.zvenoai_model
+
+
+    def resolved_api_key(self) -> str:
+        """Return the current API key from override or fresh settings."""
+
+        if self._api_key_override is not None and self._api_key_override.strip():
+            return self._api_key_override.strip()
+        return Settings().zvenoai_api_key.strip()
 
 
     def chat(
@@ -63,6 +71,12 @@ class ZvenoClient:
             Parsed JSON response from Zveno AI.
         """
 
+        api_key = self.resolved_api_key()
+        if not api_key:
+            raise ValueError(
+                "ZVENOAI_API_KEY is empty. Put the key into .env and restart."
+            )
+
         payload: dict[str, Any] = {
             "model": model or self.model,
             "messages": messages,
@@ -76,7 +90,7 @@ class ZvenoClient:
             payload["response_format"] = response_format
 
         headers = {
-            "Authorization": f"Bearer {self.api_key}",
+            "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
         }
         with httpx.Client(timeout=120.0) as client:

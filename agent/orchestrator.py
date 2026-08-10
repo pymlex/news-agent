@@ -13,6 +13,12 @@ from utils.graph_html import render_graph_html
 from utils.zveno import CHEAP_MODELS, zveno
 
 
+MISSING_KEY_MARKDOWN = (
+    "Не задан `ZVENOAI_API_KEY` в файле `.env`.\n\n"
+    "Вставьте ключ Zveno AI в строку `ZVENOAI_API_KEY=...` "
+    "и перезапустите приложение."
+)
+
 TOOLS = [
     {
         "type": "function",
@@ -267,6 +273,21 @@ class NewsAgent:
             for key in ("сгенерируй новость", "напиши новость", "собери новость", "синтез")
         ):
             return self._run_tool("synthesize_news", {"topic": text})
+        question_markers = (
+            "?",
+            "какой",
+            "какая",
+            "какие",
+            "какую",
+            "как ",
+            "сколько",
+            "почему",
+            "зачем",
+            "нужно ли",
+            "что такое",
+        )
+        if any(marker in lowered for marker in question_markers):
+            return self._run_tool("synthesize_news", {"topic": text})
         return None
 
 
@@ -298,6 +319,11 @@ class NewsAgent:
         if not text:
             return AgentReply(
                 markdown="Напишите тему, ссылку или предпочтения по СМИ.",
+                graph_html=self.last_graph_html,
+            )
+        if not zveno.resolved_api_key():
+            return AgentReply(
+                markdown=MISSING_KEY_MARKDOWN,
                 graph_html=self.last_graph_html,
             )
 
