@@ -10,6 +10,7 @@ from models.schemas import (
 from agent.skills.provenance import build_provenance_graph
 from utils.db import db
 from utils.ddg_search import search_news, search_web
+from utils.progress import ProgressCallback, emit
 from utils.zveno import zveno
 
 
@@ -18,6 +19,7 @@ def synthesize_news(
     profile_name: str = "default",
     model: str | None = None,
     max_results: int = 20,
+    on_progress: ProgressCallback | None = None,
 ) -> SynthesizedNews:
     """Generate a source-visible news article with explicit stances.
 
@@ -30,6 +32,7 @@ def synthesize_news(
         profile_name: Profile controlling trusted weights.
         model: Optional Zveno model slug.
         max_results: Soft search budget.
+        on_progress: Optional short status callback for the chat UI.
 
     Returns:
         Synthesized news package with markdown body and graph.
@@ -37,8 +40,11 @@ def synthesize_news(
 
     trust_map = db.trust_by_domain(profile_name)
     trusted = db.list_trusted_media(profile_name)
+    emit(on_progress, "Ищу источники…")
     news_hits = search_news(topic, max_results=max_results)
+    emit(on_progress, f"Нашёл {len(news_hits)} результатов по теме")
     web_hits = search_web(f"{topic} эксперты мнения", max_results=10)
+    emit(on_progress, f"Добавил {len(web_hits)} страниц с мнениями экспертов")
     hits: list[SearchHit] = []
     seen: set[str] = set()
     for hit in news_hits + web_hits:
@@ -56,6 +62,11 @@ def synthesize_news(
         return score
 
     hits = sorted(hits, key=rank_key, reverse=True)[:max_results]
+    emit(on_progress, f"Отобрал {len(hits)} источников")
+    if hits:
+        emit(on_progress, f"Читаю: {hits[0].title[:70]}")
+        if len(hits) > 1:
+            emit(on_progress, f"Также: {hits[1].title[:70]}")
 
     catalog = [
         {
@@ -85,7 +96,8 @@ def synthesize_news(
         "profile when conflict arises, and say so explicitly. "
         "Return JSON with headline, body_markdown, stances. "
         "stances is an array of actor, position, assessment, source_url, "
-        "trust_score. body_markdown may include tables and lists."
+        "trust_score. body_markdown may include tables and lists. "
+        "Do not use emoji."
     )
     user = {
         "topic": topic,
@@ -97,6 +109,7 @@ def synthesize_news(
             "infocoach from social media."
         ),
     }
+    emit(on_progress, "Собираю ответ по источникам…")
     payload = zveno.chat_json(
         messages=[
             {"role": "system", "content": system},
@@ -120,11 +133,17 @@ def synthesize_news(
             )
         )
 
+    emit(on_progress, "Строю граф цитирований…")
     graph: ProvenanceGraph = build_provenance_graph(
         topic,
         profile_name=profile_name,
         model=model,
         max_results=max_results,
+        on_progress=on_progress,
+    )
+    emit(
+        on_progress,
+        f"Граф готов: {len(graph.nodes)} узлов, {len(graph.edges)} связей",
     )
 
     body = str(payload.get("body_markdown") or "")

@@ -10,6 +10,7 @@ from agent.skills.trusted_media import build_trusted_media, trusted_media_markdo
 from models.schemas import AgentReply, Profile
 from utils.db import db
 from utils.graph_html import render_graph_html
+from utils.progress import ProgressCallback, emit
 from utils.zveno import CHEAP_MODELS, zveno
 
 
@@ -115,9 +116,9 @@ class NewsAgent:
         return (
             "<div style='border-radius:24px;padding:28px;background:linear-gradient"
             "(165deg,#020617,#0B1220 45%,#111827);color:#E2E8F0;font-family:Manrope,"
-            "Segoe UI,sans-serif;border:1px solid #2A3348;'>"
-            "<div style='font-weight:700;font-size:18px;color:#F8FAFC;'>Граф источников</div>"
-            "<div style='margin-top:8px;color:#94A3B8;'>"
+            "Segoe UI,sans-serif;border:1px solid #2A3348;font-size:18px;'>"
+            "<div style='font-weight:700;font-size:22px;color:#F8FAFC;'>Граф источников</div>"
+            "<div style='margin-top:8px;color:#94A3B8;font-size:17px;'>"
             "Отправьте тему, ссылку или запрос на доверенные СМИ."
             "</div></div>"
         )
@@ -138,13 +139,19 @@ class NewsAgent:
         self.model = model or CHEAP_MODELS[0]
 
 
-    def _run_tool(self, name: str, arguments: dict[str, Any]) -> AgentReply:
+    def _run_tool(
+        self,
+        name: str,
+        arguments: dict[str, Any],
+        on_progress: ProgressCallback | None = None,
+    ) -> AgentReply:
         if name == "build_trusted_media":
             outlets = build_trusted_media(
                 preferences=str(arguments.get("preferences") or ""),
                 profile_name=self.profile_name,
                 region=str(arguments.get("region") or ""),
                 model=self.model,
+                on_progress=on_progress,
             )
             return AgentReply(
                 markdown=trusted_media_markdown(outlets, self.profile_name),
@@ -152,6 +159,7 @@ class NewsAgent:
             )
 
         if name == "list_trusted_media":
+            emit(on_progress, "Читаю список доверенных СМИ…")
             outlets = db.list_trusted_media(self.profile_name)
             if not outlets:
                 return AgentReply(
@@ -175,7 +183,9 @@ class NewsAgent:
                 profile_name=self.profile_name,
                 model=self.model,
                 max_results=max_results,
+                on_progress=on_progress,
             )
+            emit(on_progress, "Рисую интерактивный граф…")
             graph_html = render_graph_html(graph)
             self.last_graph_html = graph_html
             lines = [
@@ -206,9 +216,11 @@ class NewsAgent:
                 profile_name=self.profile_name,
                 model=self.model,
                 max_results=max_results,
+                on_progress=on_progress,
             )
-            graph_html = ""
+            graph_html = self.last_graph_html
             if package.graph is not None:
+                emit(on_progress, "Рисую интерактивный граф…")
                 graph_html = render_graph_html(package.graph)
                 self.last_graph_html = graph_html
             md = f"## {package.headline}\n\n{package.body_markdown}"
@@ -220,7 +232,7 @@ class NewsAgent:
                     md += f"| {title} | {src.source} | [open]({src.url}) |\n"
             return AgentReply(
                 markdown=md,
-                graph_html=graph_html or self.last_graph_html,
+                graph_html=graph_html,
                 graph=package.graph,
             )
 
@@ -230,6 +242,7 @@ class NewsAgent:
                 focus=str(arguments.get("focus") or ""),
                 model=self.model,
                 max_results=min(max(int(arguments.get("max_results") or 20), 1), 30),
+                on_progress=on_progress,
             )
             return AgentReply(
                 markdown=digest.markdown,
@@ -242,7 +255,7 @@ class NewsAgent:
         )
 
 
-    def _heuristic_route(self, text: str) -> AgentReply | None:
+    def _heuristic_route_name(self, text: str) -> tuple[str, dict[str, Any]] | None:
         lowered = text.lower()
         if any(
             key in lowered
@@ -258,21 +271,18 @@ class NewsAgent:
             key in lowered
             for key in ("сми", "источник", "медиа", "издание", "канал", "создай", "собери")
         ):
-            return self._run_tool(
-                "build_trusted_media",
-                {"preferences": text, "region": ""},
-            )
+            return "build_trusted_media", {"preferences": text, "region": ""}
         if any(key in lowered for key in ("утренн", "сводка", "digest", "что нового")):
-            return self._run_tool("morning_digest", {"focus": text})
+            return "morning_digest", {"focus": text}
         if extract_url(text) or any(
             key in lowered for key in ("граф", "откуда", "цепочк", "цитир", "provenance")
         ):
-            return self._run_tool("build_provenance_graph", {"query_or_url": text})
+            return "build_provenance_graph", {"query_or_url": text}
         if any(
             key in lowered
             for key in ("сгенерируй новость", "напиши новость", "собери новость", "синтез")
         ):
-            return self._run_tool("synthesize_news", {"topic": text})
+            return "synthesize_news", {"topic": text}
         question_markers = (
             "?",
             "какой",
@@ -287,7 +297,7 @@ class NewsAgent:
             "что такое",
         )
         if any(marker in lowered for marker in question_markers):
-            return self._run_tool("synthesize_news", {"topic": text})
+            return "synthesize_news", {"topic": text}
         return None
 
 
@@ -305,11 +315,16 @@ class NewsAgent:
         return None
 
 
-    def handle(self, user_text: str) -> AgentReply:
+    def handle(
+        self,
+        user_text: str,
+        on_progress: ProgressCallback | None = None,
+    ) -> AgentReply:
         """Answer one user message with Markdown and optional graph HTML.
 
         Args:
             user_text: Telegram-style user utterance.
+            on_progress: Optional short status callback for the chat UI.
 
         Returns:
             Agent reply for Gradio rendering.
@@ -327,12 +342,15 @@ class NewsAgent:
                 graph_html=self.last_graph_html,
             )
 
-        routed = self._heuristic_route(text)
+        routed = self._heuristic_route_name(text)
         if routed is not None:
-            return routed
+            name, arguments = routed
+            emit(on_progress, f"Запускаю сценарий: {name}")
+            return self._run_tool(name, arguments, on_progress=on_progress)
 
         profile = db.get_profile(self.profile_name)
         trusted = db.list_trusted_media(self.profile_name)
+        emit(on_progress, "Думаю, какой сценарий выбрать…")
         system = (
             "Ты новостной агент происхождения источников. "
             "Отвечай по-русски. "
@@ -368,13 +386,15 @@ class NewsAgent:
             name = str(fn.get("name") or "")
             raw_args = fn.get("arguments") or "{}"
             arguments = json.loads(raw_args) if isinstance(raw_args, str) else raw_args
-            return self._run_tool(name, arguments or {})
+            emit(on_progress, f"Запускаю сценарий: {name}")
+            return self._run_tool(name, arguments or {}, on_progress=on_progress)
 
         content = str(message.get("content") or "")
         parsed = self._parse_tool_call_from_text(content)
         if parsed is not None:
             name, arguments = parsed
-            return self._run_tool(name, arguments)
+            emit(on_progress, f"Запускаю сценарий: {name}")
+            return self._run_tool(name, arguments, on_progress=on_progress)
 
         return AgentReply(markdown=content, graph_html=self.last_graph_html)
 

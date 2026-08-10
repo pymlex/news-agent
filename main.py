@@ -1,4 +1,7 @@
 import html
+import queue
+import threading
+from collections.abc import Iterator
 
 
 import gradio as gr
@@ -17,7 +20,7 @@ html, body, .gradio-container {
   background: #0B1220 !important;
   color: #E2E8F0 !important;
   font-family: Manrope, 'Segoe UI', sans-serif !important;
-  font-size: 16px !important;
+  font-size: 18px !important;
 }
 
 .gradio-container {
@@ -53,13 +56,13 @@ footer {
   justify-content: space-between;
   gap: 16px;
   width: 100%;
-  min-height: 52px;
+  min-height: 64px;
 }
 
 .na-bar h1 {
   margin: 0;
-  font-size: 30px;
-  line-height: 1.2;
+  font-size: 44px;
+  line-height: 1.15;
   color: #F8FAFC;
   font-weight: 700;
   white-space: nowrap;
@@ -74,38 +77,38 @@ footer {
 
 .na-bar select,
 .na-bar input[type="text"] {
-  height: 42px;
+  height: 46px;
   border: 1px solid #334155;
   background: #111827;
   color: #F8FAFC;
   border-radius: 10px;
   padding: 0 12px;
-  font-size: 15px;
+  font-size: 17px;
   font-family: inherit;
   outline: none;
   box-sizing: border-box;
 }
 
 .na-bar select#na-sel-profile {
-  width: 170px;
+  width: 180px;
 }
 
 .na-bar select#na-sel-model {
-  width: 270px;
+  width: 290px;
 }
 
 .na-bar input#na-inp-profile {
-  width: 210px;
+  width: 220px;
 }
 
 .na-bar button#na-btn-create {
-  height: 42px;
+  height: 46px;
   min-width: 120px;
   border: 1px solid #334155;
   background: #1E293B;
   color: #E2E8F0;
   border-radius: 10px;
-  font-size: 15px;
+  font-size: 17px;
   font-family: inherit;
   cursor: pointer;
   padding: 0 14px;
@@ -133,6 +136,20 @@ footer {
   min-height: 760px !important;
 }
 
+#na-chatbot,
+#na-chatbot * {
+  font-size: 17px !important;
+}
+
+#na-chatbot .message,
+#na-chatbot .bot,
+#na-chatbot .user,
+#na-chatbot [data-testid="bot"],
+#na-chatbot [data-testid="user"] {
+  font-size: 17px !important;
+  line-height: 1.45 !important;
+}
+
 #na-composer {
   gap: 10px !important;
   align-items: stretch !important;
@@ -151,19 +168,31 @@ footer {
   background: #111827 !important;
   border-radius: 12px !important;
   color: #F8FAFC !important;
-  font-size: 15px !important;
-  min-height: 56px !important;
+  font-size: 17px !important;
+  min-height: 60px !important;
 }
 
 #na-composer button {
-  min-height: 56px !important;
+  min-height: 60px !important;
   border-radius: 12px !important;
-  font-size: 15px !important;
+  font-size: 17px !important;
 }
 
 .prose, .markdown-body, .prose *, .markdown-body * {
   color: #E2E8F0 !important;
-  font-size: 15px !important;
+  font-size: 17px !important;
+}
+
+.prose h1, .markdown-body h1 {
+  font-size: 28px !important;
+}
+
+.prose h2, .markdown-body h2 {
+  font-size: 22px !important;
+}
+
+.prose table, .markdown-body table {
+  font-size: 16px !important;
 }
 """
 
@@ -282,26 +311,59 @@ def respond(
     history: list[dict],
     profile_name: str,
     model_name: str,
-):
+) -> Iterator[tuple[list[dict], str, str]]:
     agent.set_profile(profile_name or "default")
     agent.set_model(model_name or CHEAP_MODELS[0])
-    reply = agent.handle(message)
-    history = history + [
-        {"role": "user", "content": message},
-        {"role": "assistant", "content": reply.markdown},
-    ]
-    return history, reply.graph_html, ""
+    history = list(history or [])
+    history.append({"role": "user", "content": message})
+    history.append({"role": "assistant", "content": "• Старт"})
+    yield history, agent.last_graph_html, ""
+
+    events: queue.Queue = queue.Queue()
+    result: dict = {}
+
+    def on_progress(step: str) -> None:
+        events.put(("progress", step))
+
+    def worker() -> None:
+        result["reply"] = agent.handle(message, on_progress=on_progress)
+        events.put(("done", None))
+
+    threading.Thread(target=worker, daemon=True).start()
+    steps: list[str] = []
+    while True:
+        kind, payload = events.get()
+        if kind == "progress":
+            steps.append(str(payload))
+            history[-1] = {
+                "role": "assistant",
+                "content": "\n".join(f"• {step}" for step in steps),
+            }
+            yield history, agent.last_graph_html, ""
+            continue
+        break
+
+    reply = result["reply"]
+    progress_block = "\n".join(f"• {step}" for step in steps)
+    final = reply.markdown
+    if progress_block:
+        final = f"{progress_block}\n\n---\n\n{reply.markdown}"
+    history[-1] = {"role": "assistant", "content": final}
+    yield history, reply.graph_html, ""
 
 
-def run_digest(profile_name: str, model_name: str, history: list[dict]):
-    agent.set_profile(profile_name or "default")
-    agent.set_model(model_name or CHEAP_MODELS[0])
-    reply = agent.handle("утренняя сводка по моим предпочтениям")
-    history = history + [
-        {"role": "user", "content": "утренняя сводка"},
-        {"role": "assistant", "content": reply.markdown},
-    ]
-    return history, reply.graph_html
+def run_digest(
+    profile_name: str,
+    model_name: str,
+    history: list[dict],
+) -> Iterator[tuple[list[dict], str]]:
+    for chat_history, graph_html, _cleared in respond(
+        "утренняя сводка по моим предпочтениям",
+        history,
+        profile_name,
+        model_name,
+    ):
+        yield chat_history, graph_html
 
 
 def create_profile(new_name: str, current: str, model_name: str):

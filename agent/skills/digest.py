@@ -5,6 +5,7 @@ from datetime import datetime
 from models.schemas import DigestItem, MorningDigest
 from utils.db import db
 from utils.ddg_search import search_news, search_web
+from utils.progress import ProgressCallback, emit
 from utils.zveno import zveno
 
 
@@ -13,6 +14,7 @@ def morning_digest(
     focus: str = "",
     model: str | None = None,
     max_results: int = 20,
+    on_progress: ProgressCallback | None = None,
 ) -> MorningDigest:
     """Build an on-demand morning digest for a profile's preferences.
 
@@ -21,6 +23,7 @@ def morning_digest(
         focus: Optional extra region or topic override.
         model: Optional Zveno model slug.
         max_results: Soft search budget.
+        on_progress: Optional short status callback for the chat UI.
 
     Returns:
         Morning digest with markdown ready for Gradio.
@@ -34,8 +37,10 @@ def morning_digest(
 
     query_bits = [preferences, region, focus, "новости сегодня"]
     query = " ".join(bit for bit in query_bits if bit).strip()
+    emit(on_progress, "Собираю свежие материалы для сводки…")
     news_hits = search_news(query or "новости", max_results=max_results)
     web_hits = search_web(query or "новости", max_results=10)
+    emit(on_progress, f"Нашёл {len(news_hits) + len(web_hits)} материалов")
 
     catalog = []
     seen: set[str] = set()
@@ -76,6 +81,7 @@ def morning_digest(
         ],
         "candidates": catalog,
     }
+    emit(on_progress, "Формирую утреннюю сводку…")
     payload = zveno.chat_json(
         messages=[
             {"role": "system", "content": system},

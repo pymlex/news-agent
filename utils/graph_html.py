@@ -1,3 +1,4 @@
+import base64
 import html
 import json
 import uuid
@@ -63,15 +64,35 @@ def score_to_level(score: float) -> TrustLevel:
     return TrustLevel.VERY_LOW
 
 
+def embed_graph_document(document_html: str, height: int = 760) -> str:
+    """Wrap a full HTML document so Gradio can execute its scripts.
+
+    Args:
+        document_html: Self-contained HTML including scripts.
+        height: iframe height in pixels.
+
+    Returns:
+        iframe markup safe for Gradio HTML components.
+    """
+
+    payload = base64.b64encode(document_html.encode("utf-8")).decode("ascii")
+    return (
+        f'<iframe title="provenance-graph" '
+        f'src="data:text/html;base64,{payload}" '
+        f'style="width:100%;height:{height}px;border:0;border-radius:14px;'
+        f'background:#0B1220;"></iframe>'
+    )
+
+
 def render_graph_html(graph: ProvenanceGraph, height: int = 700) -> str:
-    """Build a self-contained interactive HTML widget for a provenance graph.
+    """Build an interactive provenance graph widget for Gradio.
 
     Args:
         graph: Provenance graph with nodes and citation edges.
         height: Pixel height of the canvas.
 
     Returns:
-        HTML string embedding vis-network with a dark blue theme.
+        iframe-embedded HTML with vis-network and a dark blue theme.
     """
 
     nodes_payload = []
@@ -104,9 +125,10 @@ def render_graph_html(graph: ProvenanceGraph, height: int = 700) -> str:
                 "font": {
                     "color": colors["font"],
                     "face": "Manrope, Segoe UI, sans-serif",
+                    "size": 16,
                 },
                 "borderWidth": 2,
-                "margin": 12,
+                "margin": 14,
             }
         )
 
@@ -120,7 +142,7 @@ def render_graph_html(graph: ProvenanceGraph, height: int = 700) -> str:
                 "label": edge.kind.value,
                 "title": html.escape(edge.evidence or edge.kind.value),
                 "color": {"color": "#64748B", "highlight": "#60A5FA"},
-                "font": {"color": "#94A3B8", "strokeWidth": 0, "size": 11},
+                "font": {"color": "#94A3B8", "strokeWidth": 0, "size": 13},
                 "smooth": {"type": "cubicBezier"},
                 "width": 1.5 + float(edge.weight),
             }
@@ -130,30 +152,43 @@ def render_graph_html(graph: ProvenanceGraph, height: int = 700) -> str:
     nodes_json = json.dumps(nodes_payload, ensure_ascii=False)
     edges_json = json.dumps(edges_payload, ensure_ascii=False)
     title = html.escape(graph.title or "Provenance graph")
-
-    return f"""
+    document = f"""<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    html, body {{
+      margin: 0;
+      padding: 0;
+      background: #0B1220;
+      color: #E2E8F0;
+      font-family: Manrope, 'Segoe UI', sans-serif;
+    }}
+  </style>
+</head>
+<body>
 <div class="na-graph-shell" style="
-  font-family: Manrope, 'Segoe UI', sans-serif;
   background: linear-gradient(165deg, #0B1220 0%, #111827 48%, #0F172A 100%);
   border-radius: 24px;
   padding: 18px;
   border: 1px solid #2A3348;
-  box-shadow: 0 18px 40px rgba(2, 6, 23, 0.55);
   color: #E2E8F0;
+  box-sizing: border-box;
+  min-height: 100vh;
 ">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700&display=swap" rel="stylesheet">
   <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px;">
     <div>
-      <div style="font-size:13px; letter-spacing:0.08em; text-transform:uppercase; color:#60A5FA; font-weight:700;">Provenance</div>
-      <div style="font-size:20px; font-weight:700; color:#F8FAFC;">{title}</div>
+      <div style="font-size:14px; letter-spacing:0.08em; text-transform:uppercase; color:#60A5FA; font-weight:700;">Provenance</div>
+      <div style="font-size:24px; font-weight:700; color:#F8FAFC;">{title}</div>
     </div>
     <div style="display:flex; gap:8px; flex-wrap:wrap;">
-      <span style="background:#3B82F6; color:#F8FAFC; border-radius:999px; padding:6px 12px; font-size:12px;">very trusted</span>
-      <span style="background:#2563EB; color:#F8FAFC; border-radius:999px; padding:6px 12px; font-size:12px;">trusted</span>
-      <span style="background:#1E3A8A; color:#E2E8F0; border-radius:999px; padding:6px 12px; font-size:12px;">ok</span>
-      <span style="background:#9A3412; color:#FFEDD5; border-radius:999px; padding:6px 12px; font-size:12px;">weak</span>
-      <span style="background:#9F1239; color:#FFE4E6; border-radius:999px; padding:6px 12px; font-size:12px;">untrusted</span>
+      <span style="background:#3B82F6; color:#F8FAFC; border-radius:999px; padding:6px 12px; font-size:13px;">very trusted</span>
+      <span style="background:#2563EB; color:#F8FAFC; border-radius:999px; padding:6px 12px; font-size:13px;">trusted</span>
+      <span style="background:#1E3A8A; color:#E2E8F0; border-radius:999px; padding:6px 12px; font-size:13px;">ok</span>
+      <span style="background:#9A3412; color:#FFEDD5; border-radius:999px; padding:6px 12px; font-size:13px;">weak</span>
+      <span style="background:#9F1239; color:#FFE4E6; border-radius:999px; padding:6px 12px; font-size:13px;">untrusted</span>
     </div>
   </div>
   <div id="{canvas_id}" style="height:{height}px; border-radius:20px; background:rgba(2,6,23,0.72); border:1px solid #2A3348;"></div>
@@ -176,7 +211,7 @@ def render_graph_html(graph: ProvenanceGraph, height: int = 700) -> str:
       shadow: {{ enabled: true, color: "rgba(37,99,235,0.35)", size: 14, x: 0, y: 6 }}
     }},
     edges: {{
-      font: {{ size: 11, color: "#94A3B8", strokeWidth: 0, face: "Manrope" }},
+      font: {{ size: 13, color: "#94A3B8", strokeWidth: 0, face: "Manrope" }},
       selectionWidth: 2
     }}
   }});
@@ -187,4 +222,7 @@ def render_graph_html(graph: ProvenanceGraph, height: int = 700) -> str:
   }});
 }})();
 </script>
+</body>
+</html>
 """
+    return embed_graph_document(document, height=height + 110)

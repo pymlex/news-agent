@@ -6,6 +6,7 @@ from models.schemas import Profile, TrustLevel, TrustedOutlet
 from utils.db import db
 from utils.ddg_search import search_web
 from utils.graph_html import score_to_level
+from utils.progress import ProgressCallback, emit
 from utils.zveno import zveno
 
 
@@ -21,6 +22,7 @@ def build_trusted_media(
     profile_name: str = "default",
     region: str = "",
     model: str | None = None,
+    on_progress: ProgressCallback | None = None,
 ) -> list[TrustedOutlet]:
     """Build a weighted trusted-media list from natural language preferences.
 
@@ -33,6 +35,7 @@ def build_trusted_media(
         profile_name: Profile that will own the saved list.
         region: Optional geographic focus.
         model: Optional Zveno model slug.
+        on_progress: Optional short status callback for the chat UI.
 
     Returns:
         Trusted outlets persisted under the profile.
@@ -44,7 +47,9 @@ def build_trusted_media(
     search_query = (
         f"{query} reliable news sources journalists experts publications"
     )
+    emit(on_progress, "Ищу кандидатов в доверенные СМИ…")
     hits = search_web(search_query, max_results=20)
+    emit(on_progress, f"Нашёл {len(hits)} кандидатов")
     catalog = [
         {
             "title": h.title,
@@ -76,6 +81,7 @@ def build_trusted_media(
             "with urls when possible."
         ),
     }
+    emit(on_progress, "Ранжирую СМИ по предпочтениям…")
     payload = zveno.chat_json(
         messages=[
             {"role": "system", "content": system},
@@ -121,6 +127,7 @@ def build_trusted_media(
     )
     db.upsert_profile(profile)
     db.replace_trusted_media(profile_name, outlets)
+    emit(on_progress, f"Сохранил {len(outlets)} доверенных СМИ")
     return outlets
 
 

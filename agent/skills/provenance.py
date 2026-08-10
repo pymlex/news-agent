@@ -15,6 +15,7 @@ from models.schemas import (
 from utils.db import db
 from utils.ddg_search import search_around_url, search_news, search_web
 from utils.graph_html import score_to_level
+from utils.progress import ProgressCallback, emit
 from utils.zveno import zveno
 
 
@@ -52,6 +53,7 @@ def build_provenance_graph(
     profile_name: str = "default",
     model: str | None = None,
     max_results: int = 20,
+    on_progress: ProgressCallback | None = None,
 ) -> ProvenanceGraph:
     """Build a citation and reinterpretation graph around a topic or URL.
 
@@ -60,6 +62,7 @@ def build_provenance_graph(
         profile_name: Profile whose trusted weights colour the graph.
         model: Optional Zveno model slug.
         max_results: Soft search budget, hard-capped elsewhere.
+        on_progress: Optional short status callback for the chat UI.
 
     Returns:
         Provenance graph with outlets, articles, experts and citation edges.
@@ -68,6 +71,7 @@ def build_provenance_graph(
     trust_map = db.trust_by_domain(profile_name)
     seed_url = extract_url(query_or_url)
     if seed_url:
+        emit(on_progress, "Разбираю ссылку и ищу пересказы…")
         hits = search_around_url(seed_url, max_results=max_results)
         topic = query_or_url.replace(seed_url, "").strip() or seed_url
         related = search_web(
@@ -79,6 +83,7 @@ def build_provenance_graph(
                 hits.append(hit)
     else:
         topic = query_or_url.strip()
+        emit(on_progress, "Ищу материалы для графа…")
         news_hits = search_news(topic, max_results=max_results)
         web_hits = search_web(
             f"{topic} источник цитата",
@@ -91,6 +96,9 @@ def build_provenance_graph(
                 continue
             seen.add(hit.url)
             hits.append(hit)
+    emit(on_progress, f"Для графа собрал {len(hits)} страниц")
+    if hits:
+        emit(on_progress, f"Смотрю: {hits[0].title[:70]}")
 
     catalog = []
     for idx, hit in enumerate(hits[:max_results]):
@@ -123,6 +131,7 @@ def build_provenance_graph(
         "documents": catalog,
         "limits": {"max_nodes": 30, "expected_typical": 7},
     }
+    emit(on_progress, "Связываю цитирования и переинтерпретации…")
     payload = zveno.chat_json(
         messages=[
             {"role": "system", "content": system},
