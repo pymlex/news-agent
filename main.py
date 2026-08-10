@@ -22,10 +22,11 @@ html, body {
 
 .gradio-container {
   font-family: Manrope, 'Segoe UI', sans-serif !important;
+  font-size: 16px !important;
   max-width: 1860px !important;
   width: 100% !important;
   margin: 0 auto !important;
-  padding: 16px 24px 20px !important;
+  padding: 12px 20px 16px !important;
   background: #020617 !important;
   color: #E2E8F0 !important;
   --body-background-fill: #020617 !important;
@@ -33,9 +34,10 @@ html, body {
   --background-fill-secondary: #111827 !important;
   --block-background-fill: transparent !important;
   --block-border-color: transparent !important;
+  --block-border-width: 0px !important;
+  --block-shadow: none !important;
   --border-color-primary: #2A3348 !important;
   --body-text-color: #E2E8F0 !important;
-  --body-text-color-subdued: #94A3B8 !important;
   --input-background-fill: #0F172A !important;
   --input-border-color: #2A3348 !important;
   --input-placeholder-color: #64748B !important;
@@ -43,36 +45,76 @@ html, body {
 }
 
 footer {
-  color: #64748B !important;
   display: none !important;
 }
 
 #na-app {
   background: linear-gradient(165deg, #020617 0%, #0B1220 50%, #111827 100%);
   border-radius: 20px;
-  padding: 18px 20px 14px;
+  padding: 14px 18px 12px;
   border: 1px solid #252E3F;
   gap: 12px !important;
-  min-height: calc(1080px - 48px);
+  min-height: calc(100vh - 28px);
 }
 
-#na-title h1 {
-  color: #F8FAFC !important;
-  margin: 0 0 8px 0 !important;
-  font-size: 28px !important;
-}
-
-#na-toolbar {
-  gap: 10px !important;
+#na-header {
+  display: flex !important;
+  flex-direction: row !important;
   flex-wrap: nowrap !important;
   align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  width: 100% !important;
+  min-height: 52px !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
-#na-toolbar > * {
-  flex: 0 1 auto !important;
+#na-header > div {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
-#na-toolbar .block {
+#na-title {
+  flex: 1 1 auto !important;
+  min-width: 220px !important;
+}
+
+#na-title h1, #na-title .prose h1, #na-title md h1 {
+  color: #F8FAFC !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 30px !important;
+  line-height: 1.15 !important;
+  font-weight: 700 !important;
+}
+
+#na-controls {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  flex: 0 0 auto !important;
+  margin-left: auto !important;
+}
+
+#na-controls > * {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+#na-profile,
+#na-model,
+#na-new-profile,
+#na-create-btn {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
@@ -81,52 +123,85 @@ footer {
 }
 
 #na-profile {
-  max-width: 180px !important;
-  min-width: 140px !important;
-  flex: 0 0 180px !important;
+  width: 160px !important;
+  min-width: 160px !important;
+  max-width: 160px !important;
 }
 
 #na-model {
-  max-width: 280px !important;
-  min-width: 220px !important;
-  flex: 0 0 280px !important;
+  width: 250px !important;
+  min-width: 250px !important;
+  max-width: 250px !important;
 }
 
 #na-new-profile {
-  max-width: 220px !important;
-  min-width: 180px !important;
-  flex: 0 0 220px !important;
+  width: 200px !important;
+  min-width: 200px !important;
+  max-width: 200px !important;
 }
 
 #na-create-btn {
-  max-width: 120px !important;
-  min-width: 110px !important;
-  flex: 0 0 120px !important;
+  width: 112px !important;
+  min-width: 112px !important;
+  max-width: 112px !important;
 }
 
-#na-toolbar .wrap-inner,
-#na-toolbar textarea,
-#na-toolbar input {
+#na-controls .wrap,
+#na-controls .wrap-inner,
+#na-controls input,
+#na-controls textarea,
+#na-controls .container,
+#na-controls .secondary-wrap {
   background: #0F172A !important;
   border: 1px solid #2A3348 !important;
   border-radius: 12px !important;
   color: #F8FAFC !important;
   box-shadow: none !important;
-  min-height: 40px !important;
-  height: 40px !important;
+  outline: none !important;
+  min-height: 44px !important;
+  height: 44px !important;
+  font-size: 15px !important;
+  line-height: 44px !important;
   padding: 0 12px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
 }
 
-#na-toolbar button {
+#na-controls .wrap {
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+#na-controls .wrap-inner {
+  display: flex !important;
+  align-items: center !important;
+}
+
+#na-controls textarea,
+#na-controls input[type="text"] {
+  display: flex !important;
+  align-items: center !important;
+  resize: none !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+#na-controls button,
+#na-create-btn button,
+#na-create-btn {
+  height: 44px !important;
+  min-height: 44px !important;
   border-radius: 12px !important;
-  min-height: 40px !important;
-  height: 40px !important;
+  font-size: 15px !important;
+  margin: 0 !important;
 }
 
 #na-main {
   gap: 14px !important;
   align-items: stretch !important;
-  flex: 1 1 auto !important;
 }
 
 #na-chatbot, #na-graph {
@@ -134,15 +209,22 @@ footer {
   border: 1px solid #2A3348 !important;
   background: #0B1220 !important;
   overflow: hidden !important;
-  height: 760px !important;
-  min-height: 760px !important;
+  height: 780px !important;
+  min-height: 780px !important;
+}
+
+#na-chatbot,
+#na-chatbot > .block,
+#na-chatbot .block {
+  border: 1px solid #2A3348 !important;
+  background: #0B1220 !important;
+  box-shadow: none !important;
 }
 
 #na-chatbot .bubble-wrap,
 #na-chatbot .message-wrap,
 #na-chatbot > div {
   background: #0B1220 !important;
-  height: 100% !important;
 }
 
 #na-chatbot .bot, #na-chatbot [data-testid="bot"] {
@@ -150,6 +232,7 @@ footer {
   border: 1px solid #2A3348 !important;
   border-radius: 14px !important;
   color: #E2E8F0 !important;
+  font-size: 15px !important;
 }
 
 #na-chatbot .user, #na-chatbot [data-testid="user"] {
@@ -157,6 +240,7 @@ footer {
   border: 1px solid #2A3348 !important;
   border-radius: 14px !important;
   color: #E2E8F0 !important;
+  font-size: 15px !important;
 }
 
 #na-composer {
@@ -164,7 +248,8 @@ footer {
   align-items: stretch !important;
 }
 
-#na-composer .block {
+#na-composer .block,
+#na-composer > div {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
@@ -178,16 +263,19 @@ footer {
   border-radius: 14px !important;
   color: #F8FAFC !important;
   min-height: 56px !important;
+  font-size: 15px !important;
 }
 
 #na-composer button {
   border-radius: 12px !important;
   min-height: 56px !important;
   max-width: 160px !important;
+  font-size: 15px !important;
 }
 
 .prose, .prose *, .markdown-body, .markdown-body * {
   color: #E2E8F0 !important;
+  font-size: 15px !important;
 }
 
 .prose th, .prose td, .markdown-body th, .markdown-body td {
@@ -211,6 +299,7 @@ ul.options, .options, [role="listbox"] {
   background: #0F172A !important;
   border: 1px solid #2A3348 !important;
   color: #E2E8F0 !important;
+  font-size: 15px !important;
 }
 
 ul.options li, [role="option"] {
@@ -278,50 +367,47 @@ def build_ui() -> gr.Blocks:
     )
     with gr.Blocks(fill_height=True) as demo:
         with gr.Column(elem_id="na-app"):
-            gr.Markdown("# Агент цитирований", elem_id="na-title")
-
-            with gr.Row(elem_id="na-toolbar", equal_height=True):
-                profile = gr.Dropdown(
-                    choices=_profile_choices(),
-                    value="default",
-                    show_label=False,
-                    container=False,
-                    interactive=True,
-                    elem_id="na-profile",
-                    scale=0,
-                    min_width=140,
-                )
-                model = gr.Dropdown(
-                    choices=CHEAP_MODELS,
-                    value=default_model,
-                    show_label=False,
-                    container=False,
-                    interactive=True,
-                    elem_id="na-model",
-                    scale=0,
-                    min_width=220,
-                )
-                new_profile = gr.Textbox(
-                    show_label=False,
-                    container=False,
-                    placeholder="Создать профиль",
-                    elem_id="na-new-profile",
-                    scale=0,
-                    min_width=180,
-                )
-                create_btn = gr.Button(
-                    "Создать",
-                    variant="secondary",
-                    elem_id="na-create-btn",
-                    scale=0,
-                    min_width=110,
-                )
+            with gr.Row(elem_id="na-header"):
+                gr.Markdown("# Агент цитирований", elem_id="na-title")
+                with gr.Row(elem_id="na-controls"):
+                    profile = gr.Dropdown(
+                        choices=_profile_choices(),
+                        value="default",
+                        show_label=False,
+                        container=False,
+                        interactive=True,
+                        elem_id="na-profile",
+                        filterable=False,
+                    )
+                    model = gr.Dropdown(
+                        choices=CHEAP_MODELS,
+                        value=default_model,
+                        show_label=False,
+                        container=False,
+                        interactive=True,
+                        elem_id="na-model",
+                        filterable=False,
+                    )
+                    new_profile = gr.Textbox(
+                        show_label=False,
+                        container=False,
+                        placeholder="Создать профиль",
+                        lines=1,
+                        max_lines=1,
+                        elem_id="na-new-profile",
+                    )
+                    create_btn = gr.Button(
+                        "Создать",
+                        variant="secondary",
+                        elem_id="na-create-btn",
+                    )
 
             with gr.Row(elem_id="na-main", equal_height=True):
                 chatbot = gr.Chatbot(
                     elem_id="na-chatbot",
                     show_label=False,
-                    height=760,
+                    container=False,
+                    height=780,
                     render_markdown=True,
                     layout="bubble",
                     scale=1,
@@ -382,6 +468,7 @@ def main() -> None:
         secondary_hue="slate",
         neutral_hue="slate",
         font=[gr.themes.GoogleFont("Manrope"), "Segoe UI", "sans-serif"],
+        text_size=gr.themes.sizes.text_lg,
     ).set(
         body_background_fill="#020617",
         body_background_fill_dark="#020617",
@@ -401,6 +488,8 @@ def main() -> None:
         input_background_fill_dark="#0F172A",
         input_border_color="#2A3348",
         input_border_color_dark="#2A3348",
+        input_border_width="1px",
+        input_border_width_dark="1px",
         button_primary_background_fill="#2563EB",
         button_primary_background_fill_dark="#2563EB",
         button_secondary_background_fill="#111827",
