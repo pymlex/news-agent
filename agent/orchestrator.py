@@ -109,7 +109,7 @@ class NewsAgent:
         return (
             "<div style='border-radius:24px;padding:28px;background:linear-gradient"
             "(165deg,#020617,#0B1220 45%,#111827);color:#E2E8F0;font-family:Manrope,"
-            "Segoe UI,sans-serif;border:1px solid #1E3A8A;'>"
+            "Segoe UI,sans-serif;border:1px solid #2A3348;'>"
             "<div style='font-weight:700;font-size:18px;color:#F8FAFC;'>Граф источников</div>"
             "<div style='margin-top:8px;color:#94A3B8;'>"
             "Отправьте тему, ссылку или запрос на доверенные СМИ."

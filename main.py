@@ -30,14 +30,14 @@ html, body {
   --background-fill-primary: #0B1220 !important;
   --background-fill-secondary: #111827 !important;
   --block-background-fill: #0B1220 !important;
-  --block-border-color: #1E3A8A !important;
-  --border-color-primary: #1E3A8A !important;
+  --block-border-color: #2A3348 !important;
+  --border-color-primary: #2A3348 !important;
   --color-accent: #3B82F6 !important;
   --link-text-color: #93C5FD !important;
   --body-text-color: #E2E8F0 !important;
   --body-text-color-subdued: #94A3B8 !important;
   --input-background-fill: #0F172A !important;
-  --input-border-color: #1E3A8A !important;
+  --input-border-color: #2A3348 !important;
   --input-placeholder-color: #64748B !important;
   --checkbox-background-color: #0F172A !important;
   --neutral-800: #1E293B !important;
@@ -53,7 +53,7 @@ footer, .svelte-1sk0pyu {
   background: linear-gradient(165deg, #020617 0%, #0B1220 42%, #111827 100%);
   border-radius: 28px;
   padding: 18px;
-  border: 1px solid #1E293B;
+  border: 1px solid #252E3F;
 }
 
 #na-title, #na-title h1, #na-title p, #na-title * {
@@ -72,11 +72,11 @@ footer, .svelte-1sk0pyu {
 }
 
 .prose table, .markdown-body table {
-  border-color: #1E3A8A !important;
+  border-color: #2A3348 !important;
 }
 
 .prose th, .prose td, .markdown-body th, .markdown-body td {
-  border-color: #1E3A8A !important;
+  border-color: #2A3348 !important;
   color: #E2E8F0 !important;
 }
 
@@ -86,7 +86,7 @@ label, .label-wrap, .label-wrap span {
 
 #na-chatbot, #na-graph {
   border-radius: 22px !important;
-  border: 1px solid #1E3A8A !important;
+  border: 1px solid #2A3348 !important;
   box-shadow: 0 16px 36px rgba(2, 6, 23, 0.55);
   background: #0B1220 !important;
 }
@@ -103,17 +103,17 @@ label, .label-wrap, .label-wrap span {
 
 #na-chatbot .bot, #na-chatbot [data-testid="bot"] {
   background: #111827 !important;
-  border: 1px solid #1E3A8A !important;
+  border: 1px solid #2A3348 !important;
 }
 
 #na-chatbot .user, #na-chatbot [data-testid="user"] {
-  background: #1E3A8A !important;
-  border: 1px solid #2563EB !important;
+  background: #172033 !important;
+  border: 1px solid #334155 !important;
 }
 
 #na-input textarea, textarea, input, .wrap-inner, .secondary-wrap {
   border-radius: 18px !important;
-  border: 1px solid #1E3A8A !important;
+  border: 1px solid #2A3348 !important;
   background: #0F172A !important;
   color: #F8FAFC !important;
 }
@@ -124,7 +124,7 @@ label, .label-wrap, .label-wrap span {
 
 ul.options, .options, [role="listbox"] {
   background: #0F172A !important;
-  border: 1px solid #1E3A8A !important;
+  border: 1px solid #2A3348 !important;
   color: #E2E8F0 !important;
 }
 
@@ -138,13 +138,13 @@ button {
 
 button.primary, .primary {
   background: linear-gradient(135deg, #2563EB, #1D4ED8) !important;
-  border: 1px solid #3B82F6 !important;
+  border: 1px solid #3B4A63 !important;
   color: #F8FAFC !important;
 }
 
 button.secondary, .secondary {
   background: #111827 !important;
-  border: 1px solid #1E3A8A !important;
+  border: 1px solid #2A3348 !important;
   color: #E2E8F0 !important;
 }
 
@@ -156,7 +156,7 @@ button.secondary, .secondary {
   padding: 6px 12px;
   font-size: 12px;
   margin-right: 6px;
-  border: 1px solid #3B82F6;
+  border: 1px solid #3B4A63;
 }
 """
 
@@ -324,16 +324,16 @@ def main() -> None:
         background_fill_secondary_dark="#111827",
         block_background_fill="#0B1220",
         block_background_fill_dark="#0B1220",
-        block_border_color="#1E3A8A",
-        block_border_color_dark="#1E3A8A",
+        block_border_color="#2A3348",
+        block_border_color_dark="#2A3348",
         body_text_color="#E2E8F0",
         body_text_color_dark="#E2E8F0",
         body_text_color_subdued="#94A3B8",
         body_text_color_subdued_dark="#94A3B8",
         input_background_fill="#0F172A",
         input_background_fill_dark="#0F172A",
-        input_border_color="#1E3A8A",
-        input_border_color_dark="#1E3A8A",
+        input_border_color="#2A3348",
+        input_border_color_dark="#2A3348",
         button_primary_background_fill="#2563EB",
         button_primary_background_fill_dark="#2563EB",
         button_primary_text_color="#F8FAFC",
@@ -342,8 +342,8 @@ def main() -> None:
         button_secondary_background_fill_dark="#111827",
         button_secondary_text_color="#E2E8F0",
         button_secondary_text_color_dark="#E2E8F0",
-        border_color_primary="#1E3A8A",
-        border_color_primary_dark="#1E3A8A",
+        border_color_primary="#2A3348",
+        border_color_primary_dark="#2A3348",
         link_text_color="#93C5FD",
         link_text_color_dark="#93C5FD",
     )

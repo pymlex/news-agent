@@ -137,7 +137,7 @@ def render_graph_html(graph: ProvenanceGraph, height: int = 640) -> str:
   background: linear-gradient(165deg, #0B1220 0%, #111827 48%, #0F172A 100%);
   border-radius: 24px;
   padding: 18px;
-  border: 1px solid #1E3A8A;
+  border: 1px solid #2A3348;
   box-shadow: 0 18px 40px rgba(2, 6, 23, 0.55);
   color: #E2E8F0;
 ">
@@ -156,7 +156,7 @@ def render_graph_html(graph: ProvenanceGraph, height: int = 640) -> str:
       <span style="background:#9F1239; color:#FFE4E6; border-radius:999px; padding:6px 12px; font-size:12px;">untrusted</span>
     </div>
   </div>
-  <div id="{canvas_id}" style="height:{height}px; border-radius:20px; background:rgba(2,6,23,0.72); border:1px solid #1E293B;"></div>
+  <div id="{canvas_id}" style="height:{height}px; border-radius:20px; background:rgba(2,6,23,0.72); border:1px solid #2A3348;"></div>
 </div>
 <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 <script>
