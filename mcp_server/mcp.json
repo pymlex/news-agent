@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "news-agent-trusted-media": {
+      "command": "python",
+      "args": ["-m", "mcp_server.server"],
+      "cwd": ".",
+      "env": {
+        "ZVENOAI_API_KEY": ""
+      }
+    }
+  }
+}
