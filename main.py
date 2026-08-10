@@ -14,65 +14,137 @@ CUSTOM_CSS = """
   color-scheme: dark !important;
 }
 
-html, body {
+html, body, .gradio-container {
   background: #020617 !important;
+  color: #E2E8F0 !important;
+  font-family: Manrope, 'Segoe UI', sans-serif !important;
 }
 
 .gradio-container {
-  font-family: Manrope, 'Segoe UI', sans-serif !important;
-  max-width: 1600px !important;
-  background: #020617 !important;
-  color: #E2E8F0 !important;
+  max-width: 1480px !important;
 }
 
-.gradio-container, .gradio-container * {
+.gradio-container {
   --body-background-fill: #020617 !important;
   --background-fill-primary: #0B1220 !important;
   --background-fill-secondary: #111827 !important;
-  --block-background-fill: #0B1220 !important;
-  --block-border-color: #2A3348 !important;
+  --block-background-fill: transparent !important;
+  --block-border-color: transparent !important;
   --border-color-primary: #2A3348 !important;
-  --color-accent: #3B82F6 !important;
-  --link-text-color: #93C5FD !important;
   --body-text-color: #E2E8F0 !important;
   --body-text-color-subdued: #94A3B8 !important;
   --input-background-fill: #0F172A !important;
   --input-border-color: #2A3348 !important;
   --input-placeholder-color: #64748B !important;
-  --checkbox-background-color: #0F172A !important;
-  --neutral-800: #1E293B !important;
-  --neutral-900: #0F172A !important;
-  --neutral-950: #020617 !important;
+  --link-text-color: #93C5FD !important;
 }
 
-footer, .svelte-1sk0pyu {
+footer {
   color: #64748B !important;
 }
 
 #na-app {
-  background: linear-gradient(165deg, #020617 0%, #0B1220 42%, #111827 100%);
-  border-radius: 28px;
-  padding: 18px;
+  background: linear-gradient(165deg, #020617 0%, #0B1220 50%, #111827 100%);
+  border-radius: 24px;
+  padding: 20px 22px 16px;
   border: 1px solid #252E3F;
+  gap: 14px !important;
 }
 
-#na-title, #na-title h1, #na-title p, #na-title * {
+#na-title h1 {
   color: #F8FAFC !important;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  margin-bottom: 4px !important;
 }
 
-#na-title p {
-  font-weight: 500 !important;
+#na-title p, #na-title .md p {
   color: #94A3B8 !important;
+  font-weight: 500 !important;
 }
 
-.prose, .prose *, .markdown-body, .markdown-body * {
+.na-chip {
+  display: inline-block;
+  background: #172033;
+  color: #BFDBFE;
+  border-radius: 999px;
+  padding: 5px 11px;
+  font-size: 12px;
+  margin-right: 6px;
+  border: 1px solid #2A3348;
+}
+
+#na-toolbar {
+  gap: 12px !important;
+}
+
+#na-toolbar .block {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+#na-toolbar label, #na-toolbar .label-wrap span {
+  color: #94A3B8 !important;
+  font-size: 12px !important;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+#na-toolbar .wrap-inner,
+#na-toolbar textarea,
+#na-toolbar input {
+  background: #0F172A !important;
+  border: 1px solid #2A3348 !important;
+  border-radius: 14px !important;
+  min-height: 44px !important;
+  color: #F8FAFC !important;
+  box-shadow: none !important;
+}
+
+#na-toolbar .wrap-inner {
+  padding: 0 12px !important;
+}
+
+#na-toolbar button {
+  min-height: 44px !important;
+  border-radius: 14px !important;
+  margin-top: 22px !important;
+}
+
+#na-main {
+  gap: 12px !important;
+  align-items: stretch !important;
+}
+
+#na-chatbot, #na-graph {
+  border-radius: 18px !important;
+  border: 1px solid #2A3348 !important;
+  background: #0B1220 !important;
+  overflow: hidden !important;
+}
+
+#na-chatbot .bubble-wrap,
+#na-chatbot .message-wrap,
+#na-chatbot > div {
+  background: #0B1220 !important;
+}
+
+#na-chatbot .bot, #na-chatbot [data-testid="bot"] {
+  background: #111827 !important;
+  border: 1px solid #2A3348 !important;
+  border-radius: 16px !important;
   color: #E2E8F0 !important;
 }
 
-.prose table, .markdown-body table {
-  border-color: #2A3348 !important;
+#na-chatbot .user, #na-chatbot [data-testid="user"] {
+  background: #172033 !important;
+  border: 1px solid #2A3348 !important;
+  border-radius: 16px !important;
+  color: #E2E8F0 !important;
+}
+
+.prose, .prose *, .markdown-body, .markdown-body *, #na-status {
+  color: #E2E8F0 !important;
 }
 
 .prose th, .prose td, .markdown-body th, .markdown-body td {
@@ -80,45 +152,35 @@ footer, .svelte-1sk0pyu {
   color: #E2E8F0 !important;
 }
 
-label, .label-wrap, .label-wrap span {
-  color: #CBD5E1 !important;
+#na-composer .block {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
 }
 
-#na-chatbot, #na-graph {
-  border-radius: 22px !important;
-  border: 1px solid #2A3348 !important;
-  box-shadow: 0 16px 36px rgba(2, 6, 23, 0.55);
-  background: #0B1220 !important;
-}
-
-#na-chatbot, #na-chatbot > *, #na-chatbot .bubble-wrap, #na-chatbot .message-wrap {
-  background: #0B1220 !important;
-  color: #E2E8F0 !important;
-}
-
-#na-chatbot .message, #na-chatbot .bot, #na-chatbot .user {
-  border-radius: 18px !important;
-  color: #E2E8F0 !important;
-}
-
-#na-chatbot .bot, #na-chatbot [data-testid="bot"] {
-  background: #111827 !important;
-  border: 1px solid #2A3348 !important;
-}
-
-#na-chatbot .user, #na-chatbot [data-testid="user"] {
-  background: #172033 !important;
-  border: 1px solid #334155 !important;
-}
-
-#na-input textarea, textarea, input, .wrap-inner, .secondary-wrap {
-  border-radius: 18px !important;
-  border: 1px solid #2A3348 !important;
+#na-composer textarea {
   background: #0F172A !important;
+  border: 1px solid #2A3348 !important;
+  border-radius: 16px !important;
+  color: #F8FAFC !important;
+  min-height: 72px !important;
+}
+
+#na-composer button {
+  border-radius: 14px !important;
+  min-height: 44px !important;
+}
+
+button.primary, .primary {
+  background: #2563EB !important;
+  border: 1px solid #3B4A63 !important;
   color: #F8FAFC !important;
 }
 
-.gr-dropdown, .container, .wrap {
+button.secondary, .secondary {
+  background: #111827 !important;
+  border: 1px solid #2A3348 !important;
   color: #E2E8F0 !important;
 }
 
@@ -131,67 +193,7 @@ ul.options, .options, [role="listbox"] {
 ul.options li, [role="option"] {
   color: #E2E8F0 !important;
 }
-
-#na-controls .wrap, #na-controls .form, #na-controls .block {
-  min-width: 0 !important;
-}
-
-#na-controls .wrap-inner,
-#na-controls .secondary-wrap,
-#na-controls input,
-#na-controls [role="listbox"],
-#na-controls .svelte-1hfxrpf {
-  min-height: 48px !important;
-  padding: 10px 14px !important;
-  box-sizing: border-box !important;
-}
-
-#na-controls .wrap-inner span,
-#na-controls .token,
-#na-controls .single-select,
-#na-controls .selected {
-  display: block !important;
-  max-width: calc(100% - 28px) !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  white-space: nowrap !important;
-  line-height: 1.4 !important;
-  padding-right: 8px !important;
-}
-
-#na-model-dd .wrap-inner,
-#na-profile-dd .wrap-inner {
-  min-width: 220px !important;
-}
-
-button {
-  border-radius: 16px !important;
-}
-
-button.primary, .primary {
-  background: linear-gradient(135deg, #2563EB, #1D4ED8) !important;
-  border: 1px solid #3B4A63 !important;
-  color: #F8FAFC !important;
-}
-
-button.secondary, .secondary {
-  background: #111827 !important;
-  border: 1px solid #2A3348 !important;
-  color: #E2E8F0 !important;
-}
-
-.na-chip {
-  display: inline-block;
-  background: #1D4ED8;
-  color: #F8FAFC;
-  border-radius: 999px;
-  padding: 6px 12px;
-  font-size: 12px;
-  margin-right: 6px;
-  border: 1px solid #3B4A63;
-}
 """
-
 
 
 def _profile_choices() -> list[str]:
@@ -203,7 +205,7 @@ def _profile_choices() -> list[str]:
 
 def on_profile_change(profile_name: str) -> str:
     agent.set_profile(profile_name)
-    return f"Активный профиль: **{profile_name}**"
+    return f"Профиль: **{profile_name}**"
 
 
 def on_model_change(model_name: str) -> str:
@@ -244,92 +246,98 @@ def create_profile(new_name: str, current: str):
     choices = _profile_choices()
     if name not in choices:
         choices.append(name)
-    return gr.update(choices=choices, value=name), f"Профиль `{name}` готов."
+    return (
+        gr.update(choices=choices, value=name),
+        "",
+        f"Профиль: **{name}**",
+    )
 
 
 def build_ui() -> gr.Blocks:
-    with gr.Blocks() as demo:
+    default_model = (
+        settings.zvenoai_model
+        if settings.zvenoai_model in CHEAP_MODELS
+        else CHEAP_MODELS[0]
+    )
+    with gr.Blocks(fill_height=True) as demo:
         with gr.Column(elem_id="na-app"):
             gr.Markdown(
                 """
 # News Agent
-<span class="na-chip">Zveno AI</span>
+<span class="na-chip">Zveno</span>
 <span class="na-chip">DuckDuckGo</span>
-<span class="na-chip">Provenance Graph</span>
+<span class="na-chip">Graph</span>
 
-Чат в духе Telegram-бота: доверенные СМИ по предпочтениям, граф цитирований,
-новость с видимыми источниками и утренняя сводка по запросу.
+Доверенные СМИ, граф цитирований, новость с источниками, утренняя сводка.
                 """,
                 elem_id="na-title",
             )
 
-            with gr.Row(elem_id="na-controls", equal_height=True):
+            with gr.Row(elem_id="na-toolbar"):
                 profile = gr.Dropdown(
                     choices=_profile_choices(),
                     value="default",
                     label="Профиль",
                     interactive=True,
-                    scale=2,
-                    min_width=220,
-                    elem_id="na-profile-dd",
-                )
-                new_profile = gr.Textbox(
-                    label="Новый профиль",
-                    placeholder="например: pilates или силовые",
-                    scale=2,
-                    min_width=200,
-                )
-                create_btn = gr.Button(
-                    "Создать / выбрать",
-                    variant="secondary",
                     scale=1,
-                    min_width=160,
+                    container=True,
                 )
                 model = gr.Dropdown(
                     choices=CHEAP_MODELS,
-                    value=settings.zvenoai_model
-                    if settings.zvenoai_model in CHEAP_MODELS
-                    else CHEAP_MODELS[0],
-                    label="Модель Zveno",
-                    scale=3,
-                    min_width=320,
-                    elem_id="na-model-dd",
+                    value=default_model,
+                    label="Модель",
+                    interactive=True,
+                    scale=2,
+                    container=True,
                 )
 
-            status = gr.Markdown("Активный профиль: **default**")
+            with gr.Row(elem_id="na-toolbar"):
+                new_profile = gr.Textbox(
+                    label="Создать профиль",
+                    placeholder="pilates, силовые, медицина",
+                    scale=4,
+                    container=True,
+                )
+                create_btn = gr.Button("Создать", variant="secondary", scale=1)
 
-            with gr.Row():
+            status = gr.Markdown("Профиль: **default**", elem_id="na-status")
+
+            with gr.Row(elem_id="na-main", equal_height=True):
                 chatbot = gr.Chatbot(
                     elem_id="na-chatbot",
                     label="Диалог",
                     height=560,
                     render_markdown=True,
                     layout="bubble",
+                    scale=1,
                 )
                 graph_html = gr.HTML(
                     value=agent.last_graph_html,
                     elem_id="na-graph",
+                    scale=1,
                 )
 
-            with gr.Row():
+            with gr.Row(elem_id="na-composer"):
                 user_input = gr.Textbox(
                     elem_id="na-input",
                     placeholder=(
-                        "Пример: доверенные СМИ про пилатес и физиотерапевтов, "
-                        "или ссылка на новость, или тема для графа"
+                        "доверенные СМИ про пилатес, ссылка на новость, "
+                        "тема для графа или синтез новости"
                     ),
                     scale=5,
                     lines=2,
+                    show_label=False,
+                    container=True,
                 )
                 send_btn = gr.Button("Отправить", variant="primary", scale=1)
-                digest_btn = gr.Button("Утренняя сводка", scale=1)
+                digest_btn = gr.Button("Сводка", variant="secondary", scale=1)
 
             profile.change(on_profile_change, inputs=profile, outputs=status)
             model.change(on_model_change, inputs=model, outputs=status)
             create_btn.click(
                 create_profile,
                 inputs=[new_profile, profile],
-                outputs=[profile, status],
+                outputs=[profile, new_profile, status],
             )
             send_btn.click(
                 respond,
@@ -367,26 +375,22 @@ def main() -> None:
         background_fill_primary_dark="#0B1220",
         background_fill_secondary="#111827",
         background_fill_secondary_dark="#111827",
-        block_background_fill="#0B1220",
-        block_background_fill_dark="#0B1220",
-        block_border_color="#2A3348",
-        block_border_color_dark="#2A3348",
+        block_background_fill="transparent",
+        block_background_fill_dark="transparent",
+        block_border_width="0px",
+        block_border_width_dark="0px",
+        block_shadow="none",
+        block_shadow_dark="none",
         body_text_color="#E2E8F0",
         body_text_color_dark="#E2E8F0",
-        body_text_color_subdued="#94A3B8",
-        body_text_color_subdued_dark="#94A3B8",
         input_background_fill="#0F172A",
         input_background_fill_dark="#0F172A",
         input_border_color="#2A3348",
         input_border_color_dark="#2A3348",
         button_primary_background_fill="#2563EB",
         button_primary_background_fill_dark="#2563EB",
-        button_primary_text_color="#F8FAFC",
-        button_primary_text_color_dark="#F8FAFC",
         button_secondary_background_fill="#111827",
         button_secondary_background_fill_dark="#111827",
-        button_secondary_text_color="#E2E8F0",
-        button_secondary_text_color_dark="#E2E8F0",
         border_color_primary="#2A3348",
         border_color_primary_dark="#2A3348",
         link_text_color="#93C5FD",
