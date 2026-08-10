@@ -122,7 +122,7 @@ def create_profile(new_name: str, current: str):
 
 
 def build_ui() -> gr.Blocks:
-    with gr.Blocks(css=CUSTOM_CSS, title="News Agent") as demo:
+    with gr.Blocks() as demo:
         with gr.Column(elem_id="na-app"):
             gr.Markdown(
                 """
@@ -164,13 +164,12 @@ def build_ui() -> gr.Blocks:
                     elem_id="na-chatbot",
                     label="Диалог",
                     height=560,
-                    type="messages",
                     render_markdown=True,
+                    layout="bubble",
                 )
                 graph_html = gr.HTML(
                     value=agent.last_graph_html,
                     elem_id="na-graph",
-                    label="Граф источников",
                 )
 
             with gr.Row():
@@ -220,6 +219,7 @@ def main() -> None:
     demo.queue().launch(
         server_name=settings.gradio_server_name,
         server_port=settings.gradio_server_port,
+        css=CUSTOM_CSS,
     )
 
 
