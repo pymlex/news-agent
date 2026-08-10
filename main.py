@@ -10,62 +10,156 @@ from utils.zveno import CHEAP_MODELS
 CUSTOM_CSS = """
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700&display=swap');
 
-:root {
-  --na-blue-950: #0B1F44;
-  --na-blue-800: #1E3A8A;
-  --na-blue-600: #2563EB;
-  --na-blue-100: #DBEAFE;
-  --na-blue-50: #EFF6FF;
-  --na-radius: 22px;
+:root, .dark, body, .gradio-container {
+  color-scheme: dark !important;
+}
+
+html, body {
+  background: #020617 !important;
 }
 
 .gradio-container {
   font-family: Manrope, 'Segoe UI', sans-serif !important;
   max-width: 1400px !important;
+  background: #020617 !important;
+  color: #E2E8F0 !important;
+}
+
+.gradio-container, .gradio-container * {
+  --body-background-fill: #020617 !important;
+  --background-fill-primary: #0B1220 !important;
+  --background-fill-secondary: #111827 !important;
+  --block-background-fill: #0B1220 !important;
+  --block-border-color: #1E3A8A !important;
+  --border-color-primary: #1E3A8A !important;
+  --color-accent: #3B82F6 !important;
+  --link-text-color: #93C5FD !important;
+  --body-text-color: #E2E8F0 !important;
+  --body-text-color-subdued: #94A3B8 !important;
+  --input-background-fill: #0F172A !important;
+  --input-border-color: #1E3A8A !important;
+  --input-placeholder-color: #64748B !important;
+  --checkbox-background-color: #0F172A !important;
+  --neutral-800: #1E293B !important;
+  --neutral-900: #0F172A !important;
+  --neutral-950: #020617 !important;
+}
+
+footer, .svelte-1sk0pyu {
+  color: #64748B !important;
 }
 
 #na-app {
-  background: linear-gradient(165deg, #EFF6FF 0%, #F8FAFC 42%, #DBEAFE 100%);
+  background: linear-gradient(165deg, #020617 0%, #0B1220 42%, #111827 100%);
   border-radius: 28px;
   padding: 18px;
+  border: 1px solid #1E293B;
 }
 
-#na-title {
-  color: var(--na-blue-950);
+#na-title, #na-title h1, #na-title p, #na-title * {
+  color: #F8FAFC !important;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
 
+#na-title p {
+  font-weight: 500 !important;
+  color: #94A3B8 !important;
+}
+
+.prose, .prose *, .markdown-body, .markdown-body * {
+  color: #E2E8F0 !important;
+}
+
+.prose table, .markdown-body table {
+  border-color: #1E3A8A !important;
+}
+
+.prose th, .prose td, .markdown-body th, .markdown-body td {
+  border-color: #1E3A8A !important;
+  color: #E2E8F0 !important;
+}
+
+label, .label-wrap, .label-wrap span {
+  color: #CBD5E1 !important;
+}
+
 #na-chatbot, #na-graph {
-  border-radius: var(--na-radius) !important;
-  border: 1px solid #BFDBFE !important;
-  box-shadow: 0 16px 36px rgba(37, 99, 235, 0.10);
-  background: rgba(255,255,255,0.78) !important;
+  border-radius: 22px !important;
+  border: 1px solid #1E3A8A !important;
+  box-shadow: 0 16px 36px rgba(2, 6, 23, 0.55);
+  background: #0B1220 !important;
 }
 
-#na-chatbot .message {
-  border-radius: 18px !important;
+#na-chatbot, #na-chatbot > *, #na-chatbot .bubble-wrap, #na-chatbot .message-wrap {
+  background: #0B1220 !important;
+  color: #E2E8F0 !important;
 }
 
-#na-input textarea {
+#na-chatbot .message, #na-chatbot .bot, #na-chatbot .user {
   border-radius: 18px !important;
-  border: 1px solid #93C5FD !important;
+  color: #E2E8F0 !important;
+}
+
+#na-chatbot .bot, #na-chatbot [data-testid="bot"] {
+  background: #111827 !important;
+  border: 1px solid #1E3A8A !important;
+}
+
+#na-chatbot .user, #na-chatbot [data-testid="user"] {
+  background: #1E3A8A !important;
+  border: 1px solid #2563EB !important;
+}
+
+#na-input textarea, textarea, input, .wrap-inner, .secondary-wrap {
+  border-radius: 18px !important;
+  border: 1px solid #1E3A8A !important;
+  background: #0F172A !important;
+  color: #F8FAFC !important;
+}
+
+.gr-dropdown, .container, .wrap {
+  color: #E2E8F0 !important;
+}
+
+ul.options, .options, [role="listbox"] {
+  background: #0F172A !important;
+  border: 1px solid #1E3A8A !important;
+  color: #E2E8F0 !important;
+}
+
+ul.options li, [role="option"] {
+  color: #E2E8F0 !important;
 }
 
 button {
   border-radius: 16px !important;
 }
 
+button.primary, .primary {
+  background: linear-gradient(135deg, #2563EB, #1D4ED8) !important;
+  border: 1px solid #3B82F6 !important;
+  color: #F8FAFC !important;
+}
+
+button.secondary, .secondary {
+  background: #111827 !important;
+  border: 1px solid #1E3A8A !important;
+  color: #E2E8F0 !important;
+}
+
 .na-chip {
   display: inline-block;
-  background: #2563EB;
-  color: white;
+  background: #1D4ED8;
+  color: #F8FAFC;
   border-radius: 999px;
   padding: 6px 12px;
   font-size: 12px;
   margin-right: 6px;
+  border: 1px solid #3B82F6;
 }
 """
+
 
 
 def _profile_choices() -> list[str]:
@@ -216,10 +310,48 @@ def main() -> None:
 
     settings.ensure_data_dir()
     demo = build_ui()
+    theme = gr.themes.Ocean(
+        primary_hue="blue",
+        secondary_hue="slate",
+        neutral_hue="slate",
+        font=[gr.themes.GoogleFont("Manrope"), "Segoe UI", "sans-serif"],
+    ).set(
+        body_background_fill="#020617",
+        body_background_fill_dark="#020617",
+        background_fill_primary="#0B1220",
+        background_fill_primary_dark="#0B1220",
+        background_fill_secondary="#111827",
+        background_fill_secondary_dark="#111827",
+        block_background_fill="#0B1220",
+        block_background_fill_dark="#0B1220",
+        block_border_color="#1E3A8A",
+        block_border_color_dark="#1E3A8A",
+        body_text_color="#E2E8F0",
+        body_text_color_dark="#E2E8F0",
+        body_text_color_subdued="#94A3B8",
+        body_text_color_subdued_dark="#94A3B8",
+        input_background_fill="#0F172A",
+        input_background_fill_dark="#0F172A",
+        input_border_color="#1E3A8A",
+        input_border_color_dark="#1E3A8A",
+        button_primary_background_fill="#2563EB",
+        button_primary_background_fill_dark="#2563EB",
+        button_primary_text_color="#F8FAFC",
+        button_primary_text_color_dark="#F8FAFC",
+        button_secondary_background_fill="#111827",
+        button_secondary_background_fill_dark="#111827",
+        button_secondary_text_color="#E2E8F0",
+        button_secondary_text_color_dark="#E2E8F0",
+        border_color_primary="#1E3A8A",
+        border_color_primary_dark="#1E3A8A",
+        link_text_color="#93C5FD",
+        link_text_color_dark="#93C5FD",
+    )
     demo.queue().launch(
         server_name=settings.gradio_server_name,
         server_port=settings.gradio_server_port,
         css=CUSTOM_CSS,
+        theme=theme,
     )
 
 

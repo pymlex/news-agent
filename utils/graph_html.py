@@ -8,34 +8,34 @@ from models.schemas import ProvenanceGraph, TrustLevel
 
 TRUST_COLORS = {
     TrustLevel.VERY_HIGH: {
-        "background": "#1D4ED8",
-        "border": "#1E3A8A",
-        "highlight": "#2563EB",
-        "font": "#F8FAFC",
-    },
-    TrustLevel.HIGH: {
         "background": "#3B82F6",
-        "border": "#1D4ED8",
+        "border": "#93C5FD",
         "highlight": "#60A5FA",
         "font": "#F8FAFC",
     },
-    TrustLevel.MEDIUM: {
-        "background": "#93C5FD",
+    TrustLevel.HIGH: {
+        "background": "#2563EB",
         "border": "#60A5FA",
-        "highlight": "#BFDBFE",
-        "font": "#0F172A",
+        "highlight": "#3B82F6",
+        "font": "#F8FAFC",
+    },
+    TrustLevel.MEDIUM: {
+        "background": "#1E3A8A",
+        "border": "#3B82F6",
+        "highlight": "#2563EB",
+        "font": "#E2E8F0",
     },
     TrustLevel.LOW: {
-        "background": "#FDBA74",
-        "border": "#F97316",
-        "highlight": "#FED7AA",
-        "font": "#0F172A",
+        "background": "#9A3412",
+        "border": "#FB923C",
+        "highlight": "#C2410C",
+        "font": "#FFEDD5",
     },
     TrustLevel.VERY_LOW: {
-        "background": "#FB7185",
-        "border": "#E11D48",
-        "highlight": "#FDA4AF",
-        "font": "#0F172A",
+        "background": "#9F1239",
+        "border": "#FB7185",
+        "highlight": "#BE123C",
+        "font": "#FFE4E6",
     },
 }
 
@@ -71,7 +71,7 @@ def render_graph_html(graph: ProvenanceGraph, height: int = 640) -> str:
         height: Pixel height of the canvas.
 
     Returns:
-        HTML string embedding vis-network with a modern blue theme.
+        HTML string embedding vis-network with a dark blue theme.
     """
 
     nodes_payload = []
@@ -101,7 +101,10 @@ def render_graph_html(graph: ProvenanceGraph, height: int = 640) -> str:
                         "border": colors["border"],
                     },
                 },
-                "font": {"color": colors["font"], "face": "Manrope, Segoe UI, sans-serif"},
+                "font": {
+                    "color": colors["font"],
+                    "face": "Manrope, Segoe UI, sans-serif",
+                },
                 "borderWidth": 2,
                 "margin": 12,
             }
@@ -116,7 +119,8 @@ def render_graph_html(graph: ProvenanceGraph, height: int = 640) -> str:
                 "arrows": "to",
                 "label": edge.kind.value,
                 "title": html.escape(edge.evidence or edge.kind.value),
-                "color": {"color": "#64748B", "highlight": "#1D4ED8"},
+                "color": {"color": "#64748B", "highlight": "#60A5FA"},
+                "font": {"color": "#94A3B8", "strokeWidth": 0, "size": 11},
                 "smooth": {"type": "cubicBezier"},
                 "width": 1.5 + float(edge.weight),
             }
@@ -130,28 +134,29 @@ def render_graph_html(graph: ProvenanceGraph, height: int = 640) -> str:
     return f"""
 <div class="na-graph-shell" style="
   font-family: Manrope, 'Segoe UI', sans-serif;
-  background: linear-gradient(160deg, #EFF6FF 0%, #DBEAFE 45%, #F8FAFC 100%);
+  background: linear-gradient(165deg, #0B1220 0%, #111827 48%, #0F172A 100%);
   border-radius: 24px;
   padding: 18px;
-  border: 1px solid #BFDBFE;
-  box-shadow: 0 18px 40px rgba(37, 99, 235, 0.12);
+  border: 1px solid #1E3A8A;
+  box-shadow: 0 18px 40px rgba(2, 6, 23, 0.55);
+  color: #E2E8F0;
 ">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700&display=swap" rel="stylesheet">
   <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px;">
     <div>
-      <div style="font-size:13px; letter-spacing:0.08em; text-transform:uppercase; color:#2563EB; font-weight:700;">Provenance</div>
-      <div style="font-size:20px; font-weight:700; color:#0F172A;">{title}</div>
+      <div style="font-size:13px; letter-spacing:0.08em; text-transform:uppercase; color:#60A5FA; font-weight:700;">Provenance</div>
+      <div style="font-size:20px; font-weight:700; color:#F8FAFC;">{title}</div>
     </div>
     <div style="display:flex; gap:8px; flex-wrap:wrap;">
-      <span style="background:#1D4ED8; color:white; border-radius:999px; padding:6px 12px; font-size:12px;">very trusted</span>
-      <span style="background:#3B82F6; color:white; border-radius:999px; padding:6px 12px; font-size:12px;">trusted</span>
-      <span style="background:#93C5FD; color:#0F172A; border-radius:999px; padding:6px 12px; font-size:12px;">ok</span>
-      <span style="background:#FDBA74; color:#0F172A; border-radius:999px; padding:6px 12px; font-size:12px;">weak</span>
-      <span style="background:#FB7185; color:#0F172A; border-radius:999px; padding:6px 12px; font-size:12px;">untrusted</span>
+      <span style="background:#3B82F6; color:#F8FAFC; border-radius:999px; padding:6px 12px; font-size:12px;">very trusted</span>
+      <span style="background:#2563EB; color:#F8FAFC; border-radius:999px; padding:6px 12px; font-size:12px;">trusted</span>
+      <span style="background:#1E3A8A; color:#E2E8F0; border-radius:999px; padding:6px 12px; font-size:12px;">ok</span>
+      <span style="background:#9A3412; color:#FFEDD5; border-radius:999px; padding:6px 12px; font-size:12px;">weak</span>
+      <span style="background:#9F1239; color:#FFE4E6; border-radius:999px; padding:6px 12px; font-size:12px;">untrusted</span>
     </div>
   </div>
-  <div id="{canvas_id}" style="height:{height}px; border-radius:20px; background:rgba(255,255,255,0.72); border:1px solid #BFDBFE;"></div>
+  <div id="{canvas_id}" style="height:{height}px; border-radius:20px; background:rgba(2,6,23,0.72); border:1px solid #1E293B;"></div>
 </div>
 <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 <script>
@@ -168,10 +173,10 @@ def render_graph_html(graph: ProvenanceGraph, height: int = 640) -> str:
     }},
     nodes: {{
       shapeProperties: {{ borderRadius: 16 }},
-      shadow: {{ enabled: true, color: "rgba(37,99,235,0.18)", size: 12, x: 0, y: 4 }}
+      shadow: {{ enabled: true, color: "rgba(37,99,235,0.35)", size: 14, x: 0, y: 6 }}
     }},
     edges: {{
-      font: {{ size: 11, color: "#475569", strokeWidth: 0, face: "Manrope" }},
+      font: {{ size: 11, color: "#94A3B8", strokeWidth: 0, face: "Manrope" }},
       selectionWidth: 2
     }}
   }});
