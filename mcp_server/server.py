@@ -1,13 +1,13 @@
 """MCP server exposing the trusted-media builder skill."""
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server import MCPServer
 
 
 from agent.skills.trusted_media import build_trusted_media, trusted_media_markdown
 from utils.db import db
 
 
-mcp = FastMCP("news-agent-trusted-media")
+mcp = MCPServer("news-agent-trusted-media")
 
 
 @mcp.tool()
