@@ -110,7 +110,7 @@ def render_graph_html(graph: ProvenanceGraph, height: int = 700) -> str:
         nodes_payload.append(
             {
                 "id": node.id,
-                "label": node.label[:72],
+                "label": node.label[:32],
                 "shape": shape,
                 "title": "<br>".join(title_bits),
                 "url": node.url,
@@ -125,26 +125,39 @@ def render_graph_html(graph: ProvenanceGraph, height: int = 700) -> str:
                 "font": {
                     "color": colors["font"],
                     "face": "Manrope, Segoe UI, sans-serif",
-                    "size": 16,
+                    "size": 13,
                 },
                 "borderWidth": 2,
-                "margin": 14,
+                "margin": 10,
             }
         )
 
     edges_payload = []
+    short_edge = {
+        "cites": "cite",
+        "reposts": "repost",
+        "reinterprets": "reint",
+        "attributes": "attr",
+        "mentions": "ment",
+    }
     for edge in graph.edges:
         edges_payload.append(
             {
                 "from": edge.source,
                 "to": edge.target,
-                "arrows": "to",
-                "label": edge.kind.value,
+                "arrows": {"to": {"enabled": True, "scaleFactor": 0.7}},
+                "label": short_edge.get(edge.kind.value, edge.kind.value[:5]),
                 "title": html.escape(edge.evidence or edge.kind.value),
                 "color": {"color": "#64748B", "highlight": "#60A5FA"},
-                "font": {"color": "#94A3B8", "strokeWidth": 0, "size": 13},
-                "smooth": {"type": "cubicBezier"},
-                "width": 1.5 + float(edge.weight),
+                "font": {
+                    "color": "#94A3B8",
+                    "strokeWidth": 0,
+                    "size": 10,
+                    "align": "middle",
+                },
+                "smooth": {"type": "cubicBezier", "roundness": 0.2},
+                "length": 260,
+                "width": 1.2 + 0.6 * float(edge.weight),
             }
         )
 
@@ -202,17 +215,25 @@ def render_graph_html(graph: ProvenanceGraph, height: int = 700) -> str:
   const network = new vis.Network(container, {{nodes, edges}}, {{
     interaction: {{ hover: true, tooltipDelay: 80, navigationButtons: true, keyboard: true }},
     physics: {{
-      solver: "forceAtlas2Based",
-      forceAtlas2Based: {{ gravitationalConstant: -42, springLength: 140, springConstant: 0.06 }},
-      stabilization: {{ iterations: 120 }}
+      solver: "barnesHut",
+      barnesHut: {{
+        gravitationalConstant: -12000,
+        centralGravity: 0.15,
+        springLength: 280,
+        springConstant: 0.02,
+        damping: 0.35,
+        avoidOverlap: 1
+      }},
+      stabilization: {{ iterations: 220 }}
     }},
     nodes: {{
-      shapeProperties: {{ borderRadius: 16 }},
-      shadow: {{ enabled: true, color: "rgba(37,99,235,0.35)", size: 14, x: 0, y: 6 }}
+      shapeProperties: {{ borderRadius: 12 }},
+      shadow: {{ enabled: true, color: "rgba(37,99,235,0.35)", size: 12, x: 0, y: 5 }}
     }},
     edges: {{
-      font: {{ size: 13, color: "#94A3B8", strokeWidth: 0, face: "Manrope" }},
-      selectionWidth: 2
+      font: {{ size: 10, color: "#94A3B8", strokeWidth: 0, face: "Manrope", vadjust: -8 }},
+      selectionWidth: 2,
+      smooth: {{ type: "cubicBezier", roundness: 0.25 }}
     }}
   }});
   network.on("doubleClick", (params) => {{

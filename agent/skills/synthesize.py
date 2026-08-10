@@ -1,4 +1,5 @@
 import json
+import re
 
 
 from models.schemas import (
@@ -23,9 +24,8 @@ def synthesize_news(
 ) -> SynthesizedNews:
     """Generate a source-visible news article with explicit stances.
 
-    Different outlets and experts keep distinct positions and assessments.
-    The accompanying provenance graph is coloured by trust weights from the
-    active profile.
+    Citations are restricted to retrieved documents only. Empty search results
+    produce an explicit refusal instead of invented URLs.
 
     Args:
         topic: Event or question to cover.
@@ -59,14 +59,36 @@ def synthesize_news(
         for key, value in trust_map.items():
             if key and key in domain:
                 score = max(score, value)
+        academic = (
+            "pubmed.ncbi.nlm.nih.gov" in hit.url
+            or "doi.org" in hit.url
+            or "openalex.org" in hit.url
+            or "wikipedia.org" in hit.url
+        )
+        if academic:
+            score = max(score, 0.75)
         return score
 
     hits = sorted(hits, key=rank_key, reverse=True)[:max_results]
     emit(on_progress, f"Отобрал {len(hits)} источников")
-    if hits:
-        emit(on_progress, f"Читаю: {hits[0].title[:70]}")
-        if len(hits) > 1:
-            emit(on_progress, f"Также: {hits[1].title[:70]}")
+    if not hits:
+        emit(on_progress, "Источников нет, ответ без выдуманных ссылок")
+        empty = ProvenanceGraph(title=topic, nodes=[], edges=[])
+        return SynthesizedNews(
+            headline=topic,
+            body_markdown=(
+                "Открытый поиск не вернул источников по запросу. "
+                "Не формирую ответ со ссылками, чтобы не галлюцинировать URL. "
+                "Попробуйте переформулировать запрос или повторить позже."
+            ),
+            sources=[],
+            stances=[],
+            graph=empty,
+        )
+
+    emit(on_progress, f"Читаю: {hits[0].title[:70]}")
+    if len(hits) > 1:
+        emit(on_progress, f"Также: {hits[1].title[:70]}")
 
     catalog = [
         {
@@ -78,6 +100,7 @@ def synthesize_news(
         }
         for h in hits
     ]
+    allowed_urls = {h.url for h in hits}
     trusted_brief = [
         {
             "name": t.name,
@@ -89,27 +112,29 @@ def synthesize_news(
     ]
 
     system = (
-        "You write Russian news briefs that keep sources visible. "
-        "Every factual claim must point to a source. "
-        "When experts disagree, present each position separately with an "
-        "assessment label. Prefer higher-weight trusted outlets from the "
-        "profile when conflict arises, and say so explicitly. "
+        "You write Russian briefs that keep sources visible. "
+        "You may cite ONLY urls from the documents array. "
+        "Never invent DOIs, pubmed links, journal urls or any other urls. "
+        "If a claim is not supported by documents, omit it. "
+        "When experts disagree, present each position separately. "
+        "Prefer higher-weight trusted outlets from the profile when conflict arises. "
         "Return JSON with headline, body_markdown, stances. "
-        "stances is an array of actor, position, assessment, source_url, "
-        "trust_score. body_markdown may include tables and lists. "
+        "stances is an array of actor, position, assessment, source_url, trust_score. "
+        "source_url must be empty or one of the document urls. "
         "Do not use emoji."
     )
     user = {
         "topic": topic,
         "trusted_media": trusted_brief,
         "documents": catalog,
+        "allowed_urls": sorted(allowed_urls),
         "style": (
             "Telegram-readable Markdown. Keep contested claims attributed. "
             "If an expert is a qualified specialist, prefer them over an "
             "infocoach from social media."
         ),
     }
-    emit(on_progress, "Собираю ответ по источникам…")
+    emit(on_progress, "Собираю ответ только по найденным источникам…")
     payload = zveno.chat_json(
         messages=[
             {"role": "system", "content": system},
@@ -122,13 +147,16 @@ def synthesize_news(
     for item in payload.get("stances", []):
         if not isinstance(item, dict):
             continue
+        source_url = str(item.get("source_url") or "")
+        if source_url and source_url not in allowed_urls:
+            source_url = ""
         score = float(item.get("trust_score", 0.5))
         stances.append(
             StanceNote(
                 actor=str(item.get("actor") or ""),
                 position=str(item.get("position") or ""),
                 assessment=str(item.get("assessment") or ""),
-                source_url=str(item.get("source_url") or ""),
+                source_url=source_url,
                 trust_score=min(max(score, 0.0), 1.0),
             )
         )
@@ -140,6 +168,7 @@ def synthesize_news(
         model=model,
         max_results=max_results,
         on_progress=on_progress,
+        seed_hits=hits,
     )
     emit(
         on_progress,
@@ -147,6 +176,10 @@ def synthesize_news(
     )
 
     body = str(payload.get("body_markdown") or "")
+    found_urls = set(re.findall(r"https?://[^\s\]\)\"<>]+", body))
+    for bad in found_urls - allowed_urls:
+        body = body.replace(bad, "")
+
     if stances:
         rows = [
             "",

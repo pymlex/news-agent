@@ -54,6 +54,7 @@ def build_provenance_graph(
     model: str | None = None,
     max_results: int = 20,
     on_progress: ProgressCallback | None = None,
+    seed_hits: list[SearchHit] | None = None,
 ) -> ProvenanceGraph:
     """Build a citation and reinterpretation graph around a topic or URL.
 
@@ -63,6 +64,7 @@ def build_provenance_graph(
         model: Optional Zveno model slug.
         max_results: Soft search budget, hard-capped elsewhere.
         on_progress: Optional short status callback for the chat UI.
+        seed_hits: Optional already retrieved hits to reuse.
 
     Returns:
         Provenance graph with outlets, articles, experts and citation edges.
@@ -70,7 +72,11 @@ def build_provenance_graph(
 
     trust_map = db.trust_by_domain(profile_name)
     seed_url = extract_url(query_or_url)
-    if seed_url:
+    if seed_hits is not None:
+        hits = list(seed_hits)
+        topic = query_or_url.replace(seed_url or "", "").strip() or query_or_url.strip()
+        emit(on_progress, f"Для графа использую {len(hits)} уже найденных источников")
+    elif seed_url:
         emit(on_progress, "Разбираю ссылку и ищу пересказы…")
         hits = search_around_url(seed_url, max_results=max_results)
         topic = query_or_url.replace(seed_url, "").strip() or seed_url
@@ -114,22 +120,26 @@ def build_provenance_graph(
             }
         )
 
+    if not catalog:
+        emit(on_progress, "Граф пуст: нет документов для связей")
+        return ProvenanceGraph(title=topic[:120], nodes=[], edges=[])
+
     system = (
-        "You reconstruct news provenance graphs. "
+        "You reconstruct news provenance graphs from provided documents only. "
+        "Do not invent articles, outlets, urls or experts absent from documents. "
         "Nodes may be outlet, article, event, expert, claim. "
         "Edges may be cites, reposts, reinterprets, attributes, mentions. "
-        "Infer likely citation and reinterpretation flows from titles and "
-        "snippets. Prefer edges grounded in explicit evidence phrases. "
+        "Prefer edges grounded in titles and snippets. "
         "Return JSON with keys title, nodes, edges. "
         "Each node needs id, label, kind, url, trust_score in [0,1]. "
-        "Each edge needs source, target, kind, weight in [0,1], evidence. "
-        "Keep labels concise. Russian evidence strings are preferred."
+        "url must be empty or come from documents. "
+        "Keep labels under 36 characters. Russian evidence strings are preferred."
     )
     user = {
         "seed": query_or_url,
         "profile_trust_hints": trust_map,
         "documents": catalog,
-        "limits": {"max_nodes": 30, "expected_typical": 7},
+        "limits": {"max_nodes": min(20, len(catalog) * 2), "expected_typical": 7},
     }
     emit(on_progress, "Связываю цитирования и переинтерпретации…")
     payload = zveno.chat_json(
@@ -141,24 +151,28 @@ def build_provenance_graph(
     )
 
     nodes: list[GraphNode] = []
+    allowed_urls = {c["url"] for c in catalog}
     for item in payload.get("nodes", []):
         if not isinstance(item, dict):
             continue
         score = float(item.get("trust_score", 0.5))
         score = min(max(score, 0.0), 1.0)
-        domain = _domain(str(item.get("url") or ""))
+        raw_url = str(item.get("url") or "")
+        url = raw_url if raw_url in allowed_urls else ""
+        domain = _domain(url)
         if domain in trust_map:
             score = max(score, trust_map[domain])
         kind_raw = str(item.get("kind") or "article")
         kind_allowed = {kind.value for kind in NodeKind}
         kind = NodeKind(kind_raw) if kind_raw in kind_allowed else NodeKind.ARTICLE
         level = score_to_level(score)
+        label = str(item.get("label") or item.get("id"))[:36]
         nodes.append(
             GraphNode(
                 id=str(item.get("id")),
-                label=str(item.get("label") or item.get("id")),
+                label=label,
                 kind=kind,
-                url=str(item.get("url") or ""),
+                url=url,
                 trust_score=score,
                 trust_level=level,
                 meta={"domain": domain},
