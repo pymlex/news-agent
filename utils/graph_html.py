@@ -63,7 +63,7 @@ def score_to_level(score: float) -> TrustLevel:
     return TrustLevel.VERY_LOW
 
 
-def render_graph_html(graph: ProvenanceGraph, height: int = 640) -> str:
+def render_graph_html(graph: ProvenanceGraph, height: int = 700) -> str:
     """Build a self-contained interactive HTML widget for a provenance graph.
 
     Args:

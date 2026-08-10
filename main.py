@@ -14,14 +14,20 @@ CUSTOM_CSS = """
   color-scheme: dark !important;
 }
 
-html, body, .gradio-container {
+html, body {
   background: #020617 !important;
-  color: #E2E8F0 !important;
-  font-family: Manrope, 'Segoe UI', sans-serif !important;
+  margin: 0 !important;
+  min-height: 100vh !important;
 }
 
 .gradio-container {
-  max-width: 1480px !important;
+  font-family: Manrope, 'Segoe UI', sans-serif !important;
+  max-width: 1860px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: 16px 24px 20px !important;
+  background: #020617 !important;
+  color: #E2E8F0 !important;
   --body-background-fill: #020617 !important;
   --background-fill-primary: #0B1220 !important;
   --background-fill-secondary: #111827 !important;
@@ -38,54 +44,126 @@ html, body, .gradio-container {
 
 footer {
   color: #64748B !important;
+  display: none !important;
 }
 
 #na-app {
   background: linear-gradient(165deg, #020617 0%, #0B1220 50%, #111827 100%);
-  border-radius: 24px;
-  padding: 20px 22px 16px;
+  border-radius: 20px;
+  padding: 18px 20px 14px;
   border: 1px solid #252E3F;
   gap: 12px !important;
+  min-height: calc(1080px - 48px);
 }
 
 #na-title h1 {
   color: #F8FAFC !important;
-  margin: 0 0 6px 0 !important;
+  margin: 0 0 8px 0 !important;
+  font-size: 28px !important;
 }
 
-#na-title p, #na-title .md p {
-  color: #94A3B8 !important;
-  margin: 0 !important;
+#na-toolbar {
+  gap: 10px !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
 }
 
-.na-chip {
-  display: inline-block;
-  background: #172033;
-  color: #BFDBFE;
-  border-radius: 999px;
-  padding: 5px 11px;
-  font-size: 12px;
-  margin: 8px 6px 10px 0;
-  border: 1px solid #2A3348;
+#na-toolbar > * {
+  flex: 0 1 auto !important;
 }
 
-.na-field-label {
-  color: #94A3B8 !important;
-  font-size: 12px !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  margin: 0 0 6px 0 !important;
+#na-toolbar .block {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
   padding: 0 !important;
-}
-
-.na-field-label p {
   margin: 0 !important;
-  color: #94A3B8 !important;
 }
 
-#na-toolbar .block,
-#na-create .block,
+#na-profile {
+  max-width: 180px !important;
+  min-width: 140px !important;
+  flex: 0 0 180px !important;
+}
+
+#na-model {
+  max-width: 280px !important;
+  min-width: 220px !important;
+  flex: 0 0 280px !important;
+}
+
+#na-new-profile {
+  max-width: 220px !important;
+  min-width: 180px !important;
+  flex: 0 0 220px !important;
+}
+
+#na-create-btn {
+  max-width: 120px !important;
+  min-width: 110px !important;
+  flex: 0 0 120px !important;
+}
+
+#na-toolbar .wrap-inner,
+#na-toolbar textarea,
+#na-toolbar input {
+  background: #0F172A !important;
+  border: 1px solid #2A3348 !important;
+  border-radius: 12px !important;
+  color: #F8FAFC !important;
+  box-shadow: none !important;
+  min-height: 40px !important;
+  height: 40px !important;
+  padding: 0 12px !important;
+}
+
+#na-toolbar button {
+  border-radius: 12px !important;
+  min-height: 40px !important;
+  height: 40px !important;
+}
+
+#na-main {
+  gap: 14px !important;
+  align-items: stretch !important;
+  flex: 1 1 auto !important;
+}
+
+#na-chatbot, #na-graph {
+  border-radius: 16px !important;
+  border: 1px solid #2A3348 !important;
+  background: #0B1220 !important;
+  overflow: hidden !important;
+  height: 760px !important;
+  min-height: 760px !important;
+}
+
+#na-chatbot .bubble-wrap,
+#na-chatbot .message-wrap,
+#na-chatbot > div {
+  background: #0B1220 !important;
+  height: 100% !important;
+}
+
+#na-chatbot .bot, #na-chatbot [data-testid="bot"] {
+  background: #111827 !important;
+  border: 1px solid #2A3348 !important;
+  border-radius: 14px !important;
+  color: #E2E8F0 !important;
+}
+
+#na-chatbot .user, #na-chatbot [data-testid="user"] {
+  background: #172033 !important;
+  border: 1px solid #2A3348 !important;
+  border-radius: 14px !important;
+  color: #E2E8F0 !important;
+}
+
+#na-composer {
+  gap: 10px !important;
+  align-items: stretch !important;
+}
+
 #na-composer .block {
   background: transparent !important;
   border: none !important;
@@ -94,54 +172,18 @@ footer {
   margin: 0 !important;
 }
 
-#na-toolbar .wrap-inner,
-#na-create .wrap-inner,
-#na-create textarea,
-#na-create input,
 #na-composer textarea {
   background: #0F172A !important;
   border: 1px solid #2A3348 !important;
   border-radius: 14px !important;
   color: #F8FAFC !important;
-  box-shadow: none !important;
-  min-height: 44px !important;
+  min-height: 56px !important;
 }
 
-#na-toolbar .wrap-inner {
-  padding: 0 12px !important;
-}
-
-#na-create button,
 #na-composer button {
-  border-radius: 14px !important;
-  min-height: 44px !important;
-}
-
-#na-chatbot, #na-graph {
-  border-radius: 18px !important;
-  border: 1px solid #2A3348 !important;
-  background: #0B1220 !important;
-  overflow: hidden !important;
-}
-
-#na-chatbot .bubble-wrap,
-#na-chatbot .message-wrap,
-#na-chatbot > div {
-  background: #0B1220 !important;
-}
-
-#na-chatbot .bot, #na-chatbot [data-testid="bot"] {
-  background: #111827 !important;
-  border: 1px solid #2A3348 !important;
-  border-radius: 16px !important;
-  color: #E2E8F0 !important;
-}
-
-#na-chatbot .user, #na-chatbot [data-testid="user"] {
-  background: #172033 !important;
-  border: 1px solid #2A3348 !important;
-  border-radius: 16px !important;
-  color: #E2E8F0 !important;
+  border-radius: 12px !important;
+  min-height: 56px !important;
+  max-width: 160px !important;
 }
 
 .prose, .prose *, .markdown-body, .markdown-body * {
@@ -236,45 +278,50 @@ def build_ui() -> gr.Blocks:
     )
     with gr.Blocks(fill_height=True) as demo:
         with gr.Column(elem_id="na-app"):
-            gr.Markdown(
-                "# Агент цитирований",
-                elem_id="na-title",
-            )
+            gr.Markdown("# Агент цитирований", elem_id="na-title")
 
-            with gr.Row(elem_id="na-toolbar", equal_height=False):
-                with gr.Column(scale=1, min_width=220):
-                    gr.Markdown("Профиль", elem_classes=["na-field-label"])
-                    profile = gr.Dropdown(
-                        choices=_profile_choices(),
-                        value="default",
-                        show_label=False,
-                        container=False,
-                        interactive=True,
-                    )
-                with gr.Column(scale=2, min_width=320):
-                    gr.Markdown("Модель", elem_classes=["na-field-label"])
-                    model = gr.Dropdown(
-                        choices=CHEAP_MODELS,
-                        value=default_model,
-                        show_label=False,
-                        container=False,
-                        interactive=True,
-                    )
-
-            with gr.Row(elem_id="na-create", equal_height=True):
+            with gr.Row(elem_id="na-toolbar", equal_height=True):
+                profile = gr.Dropdown(
+                    choices=_profile_choices(),
+                    value="default",
+                    show_label=False,
+                    container=False,
+                    interactive=True,
+                    elem_id="na-profile",
+                    scale=0,
+                    min_width=140,
+                )
+                model = gr.Dropdown(
+                    choices=CHEAP_MODELS,
+                    value=default_model,
+                    show_label=False,
+                    container=False,
+                    interactive=True,
+                    elem_id="na-model",
+                    scale=0,
+                    min_width=220,
+                )
                 new_profile = gr.Textbox(
                     show_label=False,
                     container=False,
                     placeholder="Создать профиль",
-                    scale=4,
+                    elem_id="na-new-profile",
+                    scale=0,
+                    min_width=180,
                 )
-                create_btn = gr.Button("Создать", variant="secondary", scale=1)
+                create_btn = gr.Button(
+                    "Создать",
+                    variant="secondary",
+                    elem_id="na-create-btn",
+                    scale=0,
+                    min_width=110,
+                )
 
-            with gr.Row(equal_height=True):
+            with gr.Row(elem_id="na-main", equal_height=True):
                 chatbot = gr.Chatbot(
                     elem_id="na-chatbot",
-                    label="Диалог",
-                    height=560,
+                    show_label=False,
+                    height=760,
                     render_markdown=True,
                     layout="bubble",
                     scale=1,
@@ -291,7 +338,7 @@ def build_ui() -> gr.Blocks:
                         "доверенные СМИ про пилатес, ссылка на новость, "
                         "тема для графа или синтез новости"
                     ),
-                    scale=5,
+                    scale=6,
                     lines=2,
                     show_label=False,
                     container=False,
@@ -326,7 +373,7 @@ def build_ui() -> gr.Blocks:
 
 
 def main() -> None:
-    """Launch the Gradio news agent interface."""
+    """Launch the Gradio citation agent interface."""
 
     settings.ensure_data_dir()
     demo = build_ui()
