@@ -237,7 +237,7 @@ def build_ui() -> gr.Blocks:
     with gr.Blocks(fill_height=True) as demo:
         with gr.Column(elem_id="na-app"):
             gr.Markdown(
-                "# Новостной агент",
+                "# Агент цитирований",
                 elem_id="na-title",
             )
 
