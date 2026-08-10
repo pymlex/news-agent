@@ -237,14 +237,7 @@ def build_ui() -> gr.Blocks:
     with gr.Blocks(fill_height=True) as demo:
         with gr.Column(elem_id="na-app"):
             gr.Markdown(
-                """
-# News Agent
-<span class="na-chip">Zveno</span>
-<span class="na-chip">DuckDuckGo</span>
-<span class="na-chip">Graph</span>
-
-Доверенные СМИ, граф цитирований, новость с источниками, утренняя сводка.
-                """,
+                "# Новостно агент",
                 elem_id="na-title",
             )
 
