@@ -237,7 +237,7 @@ def build_ui() -> gr.Blocks:
     with gr.Blocks(fill_height=True) as demo:
         with gr.Column(elem_id="na-app"):
             gr.Markdown(
-                "# Новостно агент",
+                "# Новостной агент",
                 elem_id="na-title",
             )
 
@@ -262,16 +262,13 @@ def build_ui() -> gr.Blocks:
                     )
 
             with gr.Row(elem_id="na-create", equal_height=True):
-                with gr.Column(scale=4, min_width=260):
-                    gr.Markdown("Новый профиль", elem_classes=["na-field-label"])
-                    new_profile = gr.Textbox(
-                        show_label=False,
-                        container=False,
-                        placeholder="pilates, силовые, медицина",
-                    )
-                with gr.Column(scale=1, min_width=120):
-                    gr.HTML("<div style='height:22px'></div>")
-                    create_btn = gr.Button("Создать", variant="secondary")
+                new_profile = gr.Textbox(
+                    show_label=False,
+                    container=False,
+                    placeholder="Создать профиль",
+                    scale=4,
+                )
+                create_btn = gr.Button("Создать", variant="secondary", scale=1)
 
             with gr.Row(equal_height=True):
                 chatbot = gr.Chatbot(
