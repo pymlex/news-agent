@@ -20,7 +20,7 @@ html, body {
 
 .gradio-container {
   font-family: Manrope, 'Segoe UI', sans-serif !important;
-  max-width: 1400px !important;
+  max-width: 1600px !important;
   background: #020617 !important;
   color: #E2E8F0 !important;
 }
@@ -132,6 +132,38 @@ ul.options li, [role="option"] {
   color: #E2E8F0 !important;
 }
 
+#na-controls .wrap, #na-controls .form, #na-controls .block {
+  min-width: 0 !important;
+}
+
+#na-controls .wrap-inner,
+#na-controls .secondary-wrap,
+#na-controls input,
+#na-controls [role="listbox"],
+#na-controls .svelte-1hfxrpf {
+  min-height: 48px !important;
+  padding: 10px 14px !important;
+  box-sizing: border-box !important;
+}
+
+#na-controls .wrap-inner span,
+#na-controls .token,
+#na-controls .single-select,
+#na-controls .selected {
+  display: block !important;
+  max-width: calc(100% - 28px) !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  line-height: 1.4 !important;
+  padding-right: 8px !important;
+}
+
+#na-model-dd .wrap-inner,
+#na-profile-dd .wrap-inner {
+  min-width: 220px !important;
+}
+
 button {
   border-radius: 16px !important;
 }
@@ -231,24 +263,37 @@ def build_ui() -> gr.Blocks:
                 elem_id="na-title",
             )
 
-            with gr.Row():
+            with gr.Row(elem_id="na-controls", equal_height=True):
                 profile = gr.Dropdown(
                     choices=_profile_choices(),
                     value="default",
                     label="Профиль",
                     interactive=True,
+                    scale=2,
+                    min_width=220,
+                    elem_id="na-profile-dd",
                 )
                 new_profile = gr.Textbox(
                     label="Новый профиль",
                     placeholder="например: pilates или силовые",
+                    scale=2,
+                    min_width=200,
                 )
-                create_btn = gr.Button("Создать / выбрать", variant="secondary")
+                create_btn = gr.Button(
+                    "Создать / выбрать",
+                    variant="secondary",
+                    scale=1,
+                    min_width=160,
+                )
                 model = gr.Dropdown(
                     choices=CHEAP_MODELS,
                     value=settings.zvenoai_model
                     if settings.zvenoai_model in CHEAP_MODELS
                     else CHEAP_MODELS[0],
                     label="Модель Zveno",
+                    scale=3,
+                    min_width=320,
+                    elem_id="na-model-dd",
                 )
 
             status = gr.Markdown("Активный профиль: **default**")
